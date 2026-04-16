@@ -22,6 +22,7 @@ export class Traffic {
             timestamp: (new Date()).getTime(),
             buttonClicked: args.params["page"],
             ips: args.ips,
+            ip: args.ip,
             pollAnswer: pollAnswerRecording
         }
 

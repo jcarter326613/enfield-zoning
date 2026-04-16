@@ -38,6 +38,7 @@ export class RouteBase<T>
                 query: request.query,
                 body: request.body,
                 ips: request.ips,
+                ip: request.ip ?? "",
             })
             response.status(successCode)
             if (result instanceof Response) {
@@ -72,4 +73,5 @@ export type ControllerParameters<B> = {
     query: Record<string, string>, 
     body: B, 
     ips: string[],
+    ip: string,
 }

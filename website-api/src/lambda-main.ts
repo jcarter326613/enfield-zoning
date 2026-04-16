@@ -79,7 +79,7 @@ class Main {
                         response.on("end", async () => {
                             console.debug(`Recieved event text ${dataText}`)
                             let event = JSON.parse(dataText)
-                            let result = lambdaHandler(event, {})
+                            let result = await lambdaHandler(event, {})
 
                             const clientRequest = http.request({
                                 host: this.awsLambdaHost,

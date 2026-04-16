@@ -35,7 +35,7 @@ export class Service {
             next(); 
         });
 
-        const crossOrigin = process.env.CROSS_ORIGIN_SOURCE ?? "https://enfieldnhzoning.prg"
+        const crossOrigin = process.env.CROSS_ORIGIN_SOURCE ?? "https://enfieldnhzoning.org"
         console.debug(`Using CORS targets ${crossOrigin}`)
         const corsTargets = crossOrigin.split(",")
 
