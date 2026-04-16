@@ -5,10 +5,32 @@
     "version": "0.2.0",
     "configurations": [
         {
-        "command": "./website/node_modules/.bin/astro dev",
-        "name": "Website",
-        "request": "launch",
-        "type": "node-terminal"
+            "command": "./website/node_modules/.bin/astro dev",
+            "name": "Website",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Website Api",
+            "program": "${workspaceFolder}/website-api/src/main.ts",
+            "cwd": "${workspaceFolder}/website-api",
+            "runtimeArgs": ["--experimental-specifier-resolution=node"],
+            "preLaunchTask": "tsc: build - website-api/tsconfig.json",
+            "outFiles": ["${workspaceFolder}/website-api/dist/**/*.js"],
+            "outputCapture": "std"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Website Api Lambda",
+            "program": "${workspaceFolder}/website-api/src/lambda-debug.ts",
+            "cwd": "${workspaceFolder}/website-api",
+            "runtimeArgs": ["--experimental-specifier-resolution=node"],
+            "preLaunchTask": "tsc: build - website-api/tsconfig.json",
+            "outFiles": ["${workspaceFolder}/website-api/dist/**/*.js"],
+            "outputCapture": "std"
         }
     ]
 }
