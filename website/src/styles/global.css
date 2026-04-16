@@ -120,6 +120,10 @@ a {
     margin-bottom: 0;
 }
 
+h2.section-title {
+    margin-top: 0;
+}
+
 .cta-row {
     display: flex;
     justify-content: center;
