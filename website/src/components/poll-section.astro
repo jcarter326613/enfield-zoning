@@ -1,43 +1,45 @@
+---
+import "../styles/global.css"
+---
+
 <poll-section>
-    <section class="section-card">
-        <h2>Survey question</h2>
-        <p>
-            How did you vote in the March 8th election on article 2 (the zoning ammendment)?
-        </p>
+    <h2>Survey question</h2>
+    <p>
+        How did you vote in the March 8th election on article 2 (the zoning ammendment)?
+    </p>
 
-        <div class="poll-options">
-            <div class="poll-option">
-                <input type="radio" name="pollChoice" value="yes" />
-                <span class="poll-option-label">
-                    <span class="poll-option-title">Yes</span>
+    <div class="poll-options">
+        <label class="poll-option">
+            <input type="radio" name="pollChoice" value="yes" />
+            <span class="poll-option-label">
+                <span class="poll-option-title">Yes</span>
+            </span>
+        </label>
+
+        <label class="poll-option">
+            <input type="radio" name="pollChoice" value="no" />
+            <span class="poll-option-label">
+                <span class="poll-option-title">No</span>
+            </span>
+        </label>
+
+        <label class="poll-option">
+            <input type="radio" name="pollChoice" value="absent" />
+            <span class="poll-option-label">
+                <span class="poll-option-title">Did not vote</span>
+                <span class="poll-option-description">
+                    Choose if you either skipped article 2 or didn't vote 
+                    at all.
                 </span>
-            </div>
+            </span>
+        </label>
+    </div>
 
-            <div class="poll-option">
-                <input type="radio" name="pollChoice" value="no" />
-                <span class="poll-option-label">
-                    <span class="poll-option-title">No</span>
-                </span>
-            </div>
-
-            <div class="poll-option">
-                <input type="radio" name="pollChoice" value="absent" />
-                <span class="poll-option-label">
-                    <span class="poll-option-title">Did not vote</span>
-                    <span class="poll-option-description">
-                        Choose if you either skipped article 2 or didn't vote 
-                        at all.
-                    </span>
-                </span>
-            </div>
-        </div>
-
-        <div class="button-row">
-            <button class="button button-primary" type="submit">
-                Submit
-            </button>
-        </div>
-    </section>
+    <div class="cta-row">
+        <button class="button button-primary" type="submit">
+            Submit
+        </button>
+    </div>
 </poll-section>
 
 <script>

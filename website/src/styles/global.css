@@ -1,0 +1,242 @@
+:root {
+    color-scheme: light;
+    --bg: #f1ede5;
+    --panel: rgba(255, 252, 247, 0.94);
+    --panel-strong: #fffdf9;
+    --text: #22312a;
+    --muted: #5d6d65;
+    --border: rgba(34, 49, 42, 0.12);
+    --accent: #2f5b4b;
+    --accent-dark: #24473b;
+    --accent-soft: #dfe9e1;
+    --shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    --max-width: 860px;
+    --radius: 18px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    font-family: Georgia, "Times New Roman", serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+body {
+    min-height: 100vh;
+    line-height: 1.5;
+    background:
+        linear-gradient(rgba(243, 239, 231, 0.74), rgba(243, 239, 231, 0.94)),
+        linear-gradient(rgba(24, 40, 32, 0.18), rgba(24, 40, 32, 0.18)),
+        none center center / cover no-repeat fixed;
+}
+
+a {
+    color: inherit;
+}
+
+.site-shell {
+    width: min(calc(100% - 1.5rem), var(--max-width));
+    margin: 0 auto;
+    padding: 1rem 0 2rem;
+}
+
+.site-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.25rem 0 1rem;
+}
+
+.eyebrow {
+    margin: 0 0 0.2rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.site-header h1 {
+    margin: 0;
+    font-size: clamp(1.65rem, 3.2vw, 2.4rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+}
+
+.site-note {
+    margin: 0;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: 999px;
+    background: rgba(255, 252, 247, 0.58);
+    backdrop-filter: blur(8px);
+    color: var(--muted);
+    font-size: 0.88rem;
+    white-space: nowrap;
+}
+
+.content-wrap {
+    display: block;
+}
+
+.content-card {
+    padding: 1.25rem;
+    min-height: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--panel);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(8px);
+}
+
+.stack {
+    display: grid;
+    gap: 1rem;
+}
+
+.section-card {
+    padding: 1.35rem;
+    border-radius: 14px;
+    background: var(--panel-strong);
+    border: 1px solid var(--border);
+}
+
+.section-card h2,
+.section-card h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    line-height: 1.12;
+}
+
+.section-card p:last-child,
+.section-card ul:last-child {
+    margin-bottom: 0;
+}
+
+.cta-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.button {
+    appearance: none;
+    border: 0;
+    border-radius: 14px; /* <-- key change */
+    padding: 0.9rem 1.3rem;
+    font: inherit;
+    cursor: pointer;
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.button-cta {
+    font-size: 1.05rem;
+    padding: 1rem 1.5rem;
+    min-width: 220px;
+    text-align: center;
+    box-shadow: 0 10px 22px rgba(47, 91, 75, 0.25);
+}
+
+.button-primary {
+    background: var(--accent);
+    color: #ffffff;
+}
+
+.button-primary:hover {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+}
+
+.button-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 14px rgba(47, 91, 75, 0.2);
+}
+
+.button-cta:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 3px rgba(47, 91, 75, 0.25),
+        0 10px 22px rgba(47, 91, 75, 0.25);
+}
+
+.poll-options {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.poll-option {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fcfbf8;
+}
+
+.poll-option input {
+    margin-top: 0.2rem;
+}
+
+.poll-option-label {
+    display: grid;
+    gap: 0.1rem;
+}
+
+.poll-option-title {
+    font-weight: 700;
+}
+
+.poll-option-description,
+.fine-print {
+    color: var(--muted);
+    font-size: 0.94rem;
+}
+
+.site-footer {
+    margin-top: 0.9rem;
+    padding: 0 0.1rem;
+    color: var(--muted);
+    font-size: 0.88rem;
+}
+
+@media (max-width: 720px) {
+    body {
+        background-attachment: scroll;
+    }
+
+    .site-shell {
+        width: min(calc(100% - 1rem), var(--max-width));
+        padding-top: 0.75rem;
+    }
+
+    .site-header {
+        display: grid;
+        gap: 0.65rem;
+        align-items: start;
+    }
+
+    .site-note {
+        width: fit-content;
+        white-space: normal;
+    }
+
+    .content-card {
+        padding: 1rem;
+    }
+
+    .section-card {
+        padding: 1.1rem;
+    }
+}
