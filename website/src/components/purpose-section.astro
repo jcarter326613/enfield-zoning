@@ -1,0 +1,35 @@
+<purpose-section>
+    <section class="section-card">
+        <h2>Why this website exists</h2>
+        <p>
+            [Add your site description here.]
+        </p>
+        <p class="fine-print">
+            This space is meant for public explanation, mutual education, and structured
+            input on zoning questions affecting Enfield.
+        </p>
+
+        <div class="button-row">
+            <button class="button button-primary" type="button">
+                Go to survey question
+            </button>
+        </div>
+    </section>
+</purpose-section>
+
+<script>
+    class PurposeSection extends HTMLElement {
+        connectedCallback() {
+            const button = this.querySelector("button")
+            button?.addEventListener("click", () => {
+                button.dispatchEvent(
+                    new CustomEvent("startPoll", {
+                        bubbles: true
+                    })
+                )
+            })
+        }
+    }
+
+    customElements.define("purpose-section", PurposeSection)
+</script>

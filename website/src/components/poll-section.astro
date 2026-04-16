@@ -1,0 +1,57 @@
+<poll-section>
+    <section class="section-card">
+        <h2>Survey question</h2>
+        <p>
+            Which of the following best reflects your current view on this zoning topic?
+        </p>
+
+        <form id="poll-form">
+            <div class="poll-options">
+                <label class="poll-option">
+                    <input type="radio" name="pollChoice" value="support" />
+                    <span class="poll-option-label">
+                        <span class="poll-option-title">Support</span>
+                        <span class="poll-option-description">
+                            I generally support the proposed direction.
+                        </span>
+                    </span>
+                </label>
+
+                <label class="poll-option">
+                    <input type="radio" name="pollChoice" value="oppose" />
+                    <span class="poll-option-label">
+                        <span class="poll-option-title">Oppose</span>
+                        <span class="poll-option-description">
+                            I generally oppose the proposed direction.
+                        </span>
+                    </span>
+                </label>
+
+                <label class="poll-option">
+                    <input type="radio" name="pollChoice" value="unsure" />
+                    <span class="poll-option-label">
+                        <span class="poll-option-title">Not sure yet</span>
+                        <span class="poll-option-description">
+                            I need more information before taking a position.
+                        </span>
+                    </span>
+                </label>
+            </div>
+
+            <div class="button-row">
+                <button class="button button-primary" type="submit">
+                    Submit
+                </button>
+                <button class="button button-secondary" type="button" data-action="show-purpose">
+                    Back
+                </button>
+            </div>
+        </form>
+    </section>
+</poll-section>
+
+<script>
+    class PollSection extends HTMLElement {}
+
+    customElements.define("poll-section", PollSection)
+</script>

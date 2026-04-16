@@ -1,0 +1,31 @@
+---
+import SiteLayout from "../layouts/layout.astro"
+import PurposeSection from "../components/purpose-section.astro"
+import PollSection from "../components/poll-section.astro"
+import PollContextSection from "../components/poll-context-section.astro"
+import ThankYouSection from "../components/thank-you-section.astro"
+---
+
+<SiteLayout title="Enfield NH Zoning">
+    <div id="content-panel">
+        <PurposeSection />
+    </div>
+
+    <div id="poll-template" style="display:none;">
+        <div class="stack">
+            <PollSection />
+            <PollContextSection />
+        </div>
+    </div>
+
+    <div id="thank-you-template" style="display:none;">
+        <ThankYouSection />
+    </div>
+</SiteLayout>
+
+<script>
+	document.addEventListener("startPoll", () => {
+		const pollTemplate = document.querySelector("#poll-template")
+		pollTemplate?.setAttribute("style", "")
+	});
+</script>
