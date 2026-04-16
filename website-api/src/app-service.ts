@@ -1,7 +1,7 @@
 import { Service } from "./service.js"
 
-import { Health } from "./routes/health.js"
+import { Traffic } from "./routes/traffic.js"
 
 export const service = new Service([
-    Health,
+    Traffic,
 ])

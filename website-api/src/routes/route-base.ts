@@ -36,7 +36,8 @@ export class RouteBase<T>
             let result = await controller.call(this.controller, {
                 params: request.params,
                 query: request.query,
-                body: request.body
+                body: request.body,
+                ips: request.ips,
             })
             response.status(successCode)
             if (result instanceof Response) {
@@ -70,4 +71,5 @@ export type ControllerParameters<B> = {
     params: Record<string, string>,
     query: Record<string, string>, 
     body: B, 
+    ips: string[],
 }

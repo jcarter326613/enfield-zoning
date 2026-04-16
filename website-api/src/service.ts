@@ -19,9 +19,6 @@ const loggerOptions: expressWinston.LoggerOptions = {
 export class Service {
     readonly app: Express
     private readonly allowedMethods = ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"]
-    private stopPollHandle: NodeJS.Timeout | null = null
-    private stopPollIntervalMs = 5 * 1000
-    private server: http.Server | null = null
 
     constructor(routes: (new (app: express.Application) => RouteBase<any>)[]) {
         this.app = express()
@@ -66,7 +63,7 @@ export class Service {
 
         return new Promise<void>(async (resolve) => {
             await initFunc()
-            this.server = this.app.listen(port, async () => { 
+            this.app.listen(port, async () => { 
                 console.log(`Server running on ${port}...`) 
                 resolve()
             })
