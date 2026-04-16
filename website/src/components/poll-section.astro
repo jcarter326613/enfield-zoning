@@ -2,56 +2,57 @@
     <section class="section-card">
         <h2>Survey question</h2>
         <p>
-            Which of the following best reflects your current view on this zoning topic?
+            How did you vote in the March 8th election on article 2 (the zoning ammendment)?
         </p>
 
-        <form id="poll-form">
-            <div class="poll-options">
-                <label class="poll-option">
-                    <input type="radio" name="pollChoice" value="support" />
-                    <span class="poll-option-label">
-                        <span class="poll-option-title">Support</span>
-                        <span class="poll-option-description">
-                            I generally support the proposed direction.
-                        </span>
-                    </span>
-                </label>
-
-                <label class="poll-option">
-                    <input type="radio" name="pollChoice" value="oppose" />
-                    <span class="poll-option-label">
-                        <span class="poll-option-title">Oppose</span>
-                        <span class="poll-option-description">
-                            I generally oppose the proposed direction.
-                        </span>
-                    </span>
-                </label>
-
-                <label class="poll-option">
-                    <input type="radio" name="pollChoice" value="unsure" />
-                    <span class="poll-option-label">
-                        <span class="poll-option-title">Not sure yet</span>
-                        <span class="poll-option-description">
-                            I need more information before taking a position.
-                        </span>
-                    </span>
-                </label>
+        <div class="poll-options">
+            <div class="poll-option">
+                <input type="radio" name="pollChoice" value="yes" />
+                <span class="poll-option-label">
+                    <span class="poll-option-title">Yes</span>
+                </span>
             </div>
 
-            <div class="button-row">
-                <button class="button button-primary" type="submit">
-                    Submit
-                </button>
-                <button class="button button-secondary" type="button" data-action="show-purpose">
-                    Back
-                </button>
+            <div class="poll-option">
+                <input type="radio" name="pollChoice" value="no" />
+                <span class="poll-option-label">
+                    <span class="poll-option-title">No</span>
+                </span>
             </div>
-        </form>
+
+            <div class="poll-option">
+                <input type="radio" name="pollChoice" value="absent" />
+                <span class="poll-option-label">
+                    <span class="poll-option-title">Did not vote</span>
+                    <span class="poll-option-description">
+                        Choose if you either skipped article 2 or didn't vote 
+                        at all.
+                    </span>
+                </span>
+            </div>
+        </div>
+
+        <div class="button-row">
+            <button class="button button-primary" type="submit">
+                Submit
+            </button>
+        </div>
     </section>
 </poll-section>
 
 <script>
-    class PollSection extends HTMLElement {}
+    class PollSection extends HTMLElement {
+        connectedCallback() {
+            const button = this.querySelector("button")
+            button?.addEventListener("click", () => {
+                button.dispatchEvent(
+                    new CustomEvent("completePoll", {
+                        bubbles: true
+                    })
+                )
+            })
+        }
+    }
 
     customElements.define("poll-section", PollSection)
 </script>

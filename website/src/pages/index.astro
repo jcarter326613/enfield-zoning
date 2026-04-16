@@ -7,25 +7,42 @@ import ThankYouSection from "../components/thank-you-section.astro"
 ---
 
 <SiteLayout title="Enfield NH Zoning">
-    <div id="content-panel">
-        <PurposeSection />
-    </div>
+    <div class="stack">
+        <div id="purpose-section">
+            <PurposeSection />
+        </div>
 
-    <div id="poll-template" style="display:none;">
-        <div class="stack">
+        <div id="poll-section" style="display:none;">
             <PollSection />
+        </div>
+
+        <div id="thank-you-section" style="display:none;">
+            <ThankYouSection />
+        </div>
+
+        <div id="poll-context-section" style="display:none;">
+            <hr />
             <PollContextSection />
         </div>
-    </div>
-
-    <div id="thank-you-template" style="display:none;">
-        <ThankYouSection />
     </div>
 </SiteLayout>
 
 <script>
 	document.addEventListener("startPoll", () => {
-		const pollTemplate = document.querySelector("#poll-template")
-		pollTemplate?.setAttribute("style", "")
+        const purposeSection = document.querySelector("#purpose-section")
+		const pollSection = document.querySelector("#poll-section")
+        const pollContextSection = document.querySelector("#poll-context-section")
+
+        purposeSection?.setAttribute("style", "display:none;")
+		pollSection?.setAttribute("style", "")
+        pollContextSection?.setAttribute("style", "")
+	});
+
+	document.addEventListener("completePoll", () => {
+		const pollSection = document.querySelector("#poll-section")
+        const thankYouSection = document.querySelector("#thank-you-section")
+
+        pollSection?.setAttribute("style", "display:none;")
+        thankYouSection?.setAttribute("style", "")
 	});
 </script>
