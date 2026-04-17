@@ -59,7 +59,7 @@ import "../styles/global.css"
 
                 const value = selected.value
 
-                postTraffic("startPoll", value)
+                postTraffic("completePoll", value)
                 .finally(() =>
                     button.dispatchEvent(
                         new CustomEvent("completePoll", {
