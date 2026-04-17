@@ -5,7 +5,7 @@ export class Traffic {
     readonly bucketName: string = "enfieldnhzoning-data"
 
     public async traffic(args: ControllerParameters<any>): Promise<void> {
-        const pollAnswer = args.body["poll-answer"]?.toUpperCase()
+        const pollAnswer = args.body["pollAnswer"]?.toUpperCase()
         let pollAnswerRecording = undefined
 
         switch (pollAnswer) {

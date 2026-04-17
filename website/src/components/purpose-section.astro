@@ -23,6 +23,8 @@ import "../styles/global.css"
 </purpose-section>
 
 <script>
+    import { postTraffic } from "../scripts/post-traffic"
+    
     class PurposeSection extends HTMLElement {
         connectedCallback() {
             const button = this.querySelector("button")
@@ -32,7 +34,11 @@ import "../styles/global.css"
                         bubbles: true
                     })
                 )
+
+                postTraffic("startPoll")
             })
+
+            postTraffic("displayPurpose")
         }
     }
 

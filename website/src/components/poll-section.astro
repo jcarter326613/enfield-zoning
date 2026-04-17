@@ -42,15 +42,30 @@ import "../styles/global.css"
 </poll-section>
 
 <script>
+    import { postTraffic } from "../scripts/post-traffic"
+
     class PollSection extends HTMLElement {
         connectedCallback() {
             const button = this.querySelector("button")
             button?.addEventListener("click", () => {
-                button.dispatchEvent(
-                    new CustomEvent("completePoll", {
-                        bubbles: true
-                    })
+                const selected = this.querySelector<HTMLInputElement>(
+                    "input[name='pollChoice']:checked"
                 )
+
+                if (!selected) {
+                    alert("Please select an option before submitting.")
+                    return
+                }
+
+                const value = selected.value
+
+                postTraffic("startPoll", value)
+                .finally(() =>
+                    button.dispatchEvent(
+                        new CustomEvent("completePoll", {
+                            bubbles: true
+                        })
+                ))
             })
         }
     }
