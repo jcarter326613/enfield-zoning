@@ -5,6 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "node",
+            "request": "launch",
+            "name": "Data Analysis",
+            "program": "${workspaceFolder}/data-analysis/src/main.ts",
+            "cwd": "${workspaceFolder}/data-analysis",
+            "runtimeArgs": ["--experimental-specifier-resolution=node"],
+            "preLaunchTask": "tsc: build - data-analysis/tsconfig.json",
+            "outFiles": ["${workspaceFolder}/data-analysis/dist/**/*.js"],
+            "outputCapture": "std"
+        },
+        {
             "command": "./website/node_modules/.bin/astro dev",
             "name": "Website",
             "request": "launch",

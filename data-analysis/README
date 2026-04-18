@@ -1,0 +1,4 @@
+To download all s3 data
+```
+aws s3 sync s3://enfieldnhzoning-data/v1/traffic/ .
+```
