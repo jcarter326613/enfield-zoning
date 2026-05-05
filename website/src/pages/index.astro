@@ -2,49 +2,27 @@
 import "../styles/global.css"
 
 import SiteLayout from "../layouts/layout.astro"
-import PurposeSection from "../components/purpose-section.astro"
-import PollSection from "../components/poll-section.astro"
-import PollContextSection from "../components/poll-context-section.astro"
-import ThankYouSection from "../components/thank-you-section.astro"
+import PollCardTemplate from "../components/index/poll-card.astro"
 ---
 
 <SiteLayout title="Enfield NH Zoning">
-    <div class="stack">
-        <div id="purpose-section">
-            <PurposeSection />
-        </div>
-
-        <div id="poll-section" style="display:none;">
-            <PollSection />
-        </div>
-
-        <div id="thank-you-section" style="display:none;">
-            <ThankYouSection />
-        </div>
-
-        <div id="poll-context-section" style="display:none;">
-            <hr />
-            <PollContextSection />
-        </div>
+    <div class="stack" id="contents">
+        <PollCardTemplate id="template" />
     </div>
 </SiteLayout>
 
 <script>
-	document.addEventListener("startPoll", () => {
-        const purposeSection = document.querySelector("#purpose-section")
-		const pollSection = document.querySelector("#poll-section")
-        const pollContextSection = document.querySelector("#poll-context-section")
+    import { createPollCard } from "../scripts/index/poll-card"
+    import $ from "jquery"
 
-        purposeSection?.setAttribute("style", "display:none;")
-		pollSection?.setAttribute("style", "")
-        pollContextSection?.setAttribute("style", "")
-	});
+    async function loadCards() {
+        const template = $("template")
 
-	document.addEventListener("completePoll", () => {
-		const pollSection = document.querySelector("#poll-section")
-        const thankYouSection = document.querySelector("#thank-you-section")
+        const stack = $("#contents")
+        let newCard = createPollCard(template)
 
-        pollSection?.setAttribute("style", "display:none;")
-        thankYouSection?.setAttribute("style", "")
-	});
+        stack.append(newCard)
+    }
+
+    loadCards()
 </script>
