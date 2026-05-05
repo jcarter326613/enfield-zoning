@@ -1,10 +1,10 @@
 import express from "express"
 
 import { RouteBase } from "./route-base.js"
-import { Traffic as TrafficController } from "../controllers/home.js"
+import { Home as HomeController } from "../controllers/home.js"
 import { HttpStatusCode } from "../http-status-code.js"
 
-export class Home extends RouteBase<TrafficController>
+export class Home extends RouteBase<HomeController>
 {
     constructor(app: express.Application)
     {
@@ -14,6 +14,6 @@ export class Home extends RouteBase<TrafficController>
 
     private initialize()
     {
-        this.setupGet<void>("/home", this.controller.traffic, HttpStatusCode.OK)
+        this.setupGet<void>("/home", this.controller.index)
     }
 }

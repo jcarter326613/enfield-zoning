@@ -1,6 +1,8 @@
 import $ from "jquery"
 
-export function createPollCard(template: JQuery<HTMLElement>): JQuery<HTMLElement> {
+import type { PollCard } from "@enfield-zoning/website-api-dto"
+
+export function createPollCard(template: JQuery<HTMLElement>, detail: PollCard): JQuery<HTMLElement> {
     if (!template) {
         throw new Error("Poll card template was not found.")
     }
@@ -11,11 +13,11 @@ export function createPollCard(template: JQuery<HTMLElement>): JQuery<HTMLElemen
     const summary = node.find("#poll-summary")
 
     if (link) {
-        link.html("Hello")
+        link.html(detail.title)
     }
 
     if (summary) {
-        summary.html("World")
+        summary.html(detail.summary)
     }
 
     return node

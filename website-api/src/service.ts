@@ -18,6 +18,7 @@ const loggerOptions: expressWinston.LoggerOptions = {
 
 export class Service {
     readonly app: Express
+    private readonly allowedMethods = ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"]
 
     constructor(routes: (new (app: express.Application) => RouteBase<any>)[]) {
         this.app = express()
@@ -26,6 +27,21 @@ export class Service {
             res.setHeader('Last-Modified', (new Date()).toUTCString());
             next(); 
         });
+        
+        const crossOrigin = process.env.CROSS_ORIGIN_SOURCE ?? "http://localhost:4321"
+        console.debug(`Using CORS targets ${crossOrigin}`)
+        const corsTargets = crossOrigin.split(",")
+
+        const allowedMethodsString = this.allowedMethods.filter(x => x != "OPTIONS").join(",")
+        this.app.use((req, res, next) => {
+            const providedOrigin = req.headers.origin ?? ""
+            const origin = corsTargets.includes(providedOrigin.toLowerCase()) ? providedOrigin : corsTargets[0]
+            res.header("Access-Control-Allow-Origin", origin)
+            res.header("Access-Control-Allow-Headers", "Content-Type")
+            res.header("Access-Control-Allow-Methods", allowedMethodsString)
+            res.header("Access-Control-Allow-Credentials", "true")
+            return next()
+        })
 
         this.app.use(express.json())
         this.app.use(expressWinston.logger(loggerOptions))

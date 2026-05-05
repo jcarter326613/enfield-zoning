@@ -17,6 +17,7 @@
     "jquery": "^4.0.0"
   },
   "devDependencies": {
+    "@enfield-zoning/website-api-dto": "*",
     "@astrojs/check": "^0.9.9",
     "@eslint/js": "^10.0.1",
     "@types/jquery": "^4.0.0",

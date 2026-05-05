@@ -16,6 +16,14 @@ export class RouteBase<T>
         this.controller = controller
     }
 
+    protected setupGet<B>(
+        path: string, 
+        controller: (args: ControllerParameters<B>) => any)
+    {
+        this.app.get(path, async (request: TypedRequest<B>, response: express.Response) => 
+            this.callController<B>(request, response, HttpStatusCode.OK, controller))
+    }
+
     protected setupPost<B>(
         path: string, 
         controller: (args: ControllerParameters<B>) => any,
