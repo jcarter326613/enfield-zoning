@@ -1,0 +1,11 @@
+{
+    "private": true,
+    "workspaces": [
+        "website",
+        "website-api",
+        "website-api-dto"
+    ],
+    "scripts": {
+        "build": "npm run build --workspaces"
+    }
+}

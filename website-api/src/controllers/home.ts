@@ -1,10 +1,8 @@
 import { ControllerParameters } from "../routes/route-base.js"
-import { writeJsonFileToS3 } from "../services/s3-writter.js"
+import { Thing } from "@enfield-zoning/website-api-dto"
 
 export class Home {
-    readonly bucketName: string = "enfieldnhzoning-data"
-
-    public async index(args: ControllerParameters<any>): Promise<void> {
+    public async index(args: ControllerParameters<any>): Promise<Thing> {
         
     }
 }
