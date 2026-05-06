@@ -7,6 +7,7 @@ import PollCardTemplate from "../components/index/poll-card.astro"
 
 <SiteLayout title="Enfield NH Zoning">
     <div class="stack" id="contents">
+        <h2>Current Polls - June Batch</h2>
         <PollCardTemplate id="template" />
     </div>
 </SiteLayout>
@@ -14,29 +15,23 @@ import PollCardTemplate from "../components/index/poll-card.astro"
 <script>
     import $ from "jquery"
     import type { HomeModel } from "@enfield-zoning/website-api-dto"
+    import { fetchGet } from "../scripts/fetch"
     import { createPollCard } from "../scripts/index/poll-card"
 
-    const TRAFFIC_URL = "http://localhost:8080/"
-
     async function loadCards() {
-        // Get the data
-        const response = await fetch(`${TRAFFIC_URL}home/`, {
-            method: "GET"
-        })
-
-        if (!response.ok) {
-            console.error("Traffic POST failed", response.status, response.statusText)
-            return false
-        }
-
-        const data = (await response.json()) as HomeModel
+        const data = await fetchGet<HomeModel>("home")
 
         // Display the data
         const template = $("template")
         const stack = $("#contents")
-        for (let card of data.cards) {
-            const newCard = createPollCard(template, card)
-            stack.append(newCard)
+
+        if (data == null) {
+            stack.html("")
+        } else {
+            for (let card of data.cards) {
+                const newCard = createPollCard(template, card)
+                stack.append(newCard)
+            }
         }
     }
 

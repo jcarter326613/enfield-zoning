@@ -1,0 +1,41 @@
+---
+import "../styles/global.css"
+
+import SiteLayout from "../layouts/layout.astro"
+---
+
+<SiteLayout title="Enfield NH Zoning Poll">
+    <div>
+        <h2>Summary</h2>
+        <div id="summary-div"></div>
+    </div>
+    <div>
+        <h2>Actual Change</h2>
+        <div id="actual-change-div"></div>
+    </div>
+</SiteLayout>
+
+<script>
+    import $ from "jquery"
+    import type { ActivePollModel } from "@enfield-zoning/website-api-dto"
+
+    import { fetchGet } from "../scripts/fetch"
+    import { markdownToHtml } from "../scripts/markdown"
+
+    async function loadPage() {
+        const infoModel = await fetchGet<ActivePollModel>("active-poll")
+
+        // Display the data
+        const summaryDiv = $("#summary-div")
+        const actualChangeDiv = $("#actual-change-div")
+        if (infoModel == null) {
+            summaryDiv.html("")
+            actualChangeDiv.html("")
+        } else {
+            summaryDiv.html(markdownToHtml(infoModel.summaryMarkdown))
+            actualChangeDiv.html(markdownToHtml(infoModel.zoningText))
+        }
+    }
+
+    loadPage()
+</script>

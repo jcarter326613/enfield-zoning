@@ -6,3 +6,8 @@ export type PollCard = {
     title: string
     summary: string
 }
+
+export type ActivePollModel = {
+    summaryMarkdown: string
+    zoningText: string
+}
