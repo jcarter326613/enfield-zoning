@@ -24,3 +24,8 @@ export type VotingOption = {
     value: string,
     label: string,
 }
+
+export type SubmitIdentityRequest = {
+    name: string,
+    street: string,
+}

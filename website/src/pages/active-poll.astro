@@ -21,7 +21,7 @@ import SiteLayout from "../layouts/layout.astro"
         </div>
         <div class="contents logged-out">
             <div>In order to participate in the poll, you must tell us who you are.</div>
-            <div><button id="submit-identity">Submit Identity</button></div>
+            <div><button id="start-submit-identity">Submit Identity</button></div>
         </div>
     </div>
     <div id="identity-submission" style="display:none;">
@@ -42,7 +42,7 @@ import SiteLayout from "../layouts/layout.astro"
                 </label>
             </div>
             <div>
-                <button>Submit</button>
+                <button id="submit-identity">Submit</button>
             </div>
         </div>
     </div>
@@ -50,15 +50,19 @@ import SiteLayout from "../layouts/layout.astro"
 
 <script>
     import $ from "jquery"
-    import type { ActivePollModel } from "@enfield-zoning/website-api-dto"
+    import type { 
+        ActivePollModel,
+        SubmitIdentityRequest,
+    } from "@enfield-zoning/website-api-dto"
 
-    import { fetchGet } from "../scripts/fetch"
+    import { fetchGet, fetchPost } from "../scripts/fetch"
     import { markdownToHtml } from "../scripts/markdown"
 
     function connectButtons() {
-        $("#submit-identity").on("click", () => {
+        $("#start-submit-identity").on("click", () => {
             $("#identity-submission").show()
         })
+        $("#submit-identity").on("click", submitIdentity)
     }
 
     async function loadPage() {
@@ -117,6 +121,22 @@ import SiteLayout from "../layouts/layout.astro"
                 votingLoggedInBlock.hide()
                 votingLoggedOutBlock.show()
             }
+        }
+    }
+
+    async function submitIdentity() {
+        const formDiv = $("#identity-submission")
+        const nameInput = $("#identity-name", formDiv)
+        const streetInput = $("#identity-street", formDiv)
+
+        try {
+            await fetchPost<SubmitIdentityRequest, void>("identity", {
+                name: nameInput.text(),
+                street: streetInput.text()
+            })
+            loadPage()
+        } catch (e: any) {
+            // Display an error
         }
     }
 
