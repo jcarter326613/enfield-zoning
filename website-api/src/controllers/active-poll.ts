@@ -7,11 +7,10 @@ export class ActivePoll {
             type: "zoning-ammendment",
             summaryMarkdown: "This is a summary.",
             zoningText: "This is some detailed text about zoning laws.",
-            /*
             poll: {
                 loggedIn: false,
             }
-                */
+            /*
             poll: {
                 loggedIn: true,
                 votingQuestion: "What is your favorite color?",
@@ -25,17 +24,7 @@ export class ActivePoll {
                     label: "Red",
                     value: "red"
                 }]
-            }
-            /*
-            votingQuestion: "What is your favorite color?",
-            votingOptions: `<label for="yes">
-  <input type="radio" id="yes" name="subscribe" value="yup" checked />
-  Yup
-  </label>
-<label for="no">
-  <input type="radio" id="no" name="subscribe" value="nope" />
-  Nope
-</label>`,*/
+            }*/
         }
     }
 }
