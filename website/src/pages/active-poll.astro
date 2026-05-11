@@ -5,13 +5,24 @@ import SiteLayout from "../layouts/layout.astro"
 ---
 
 <SiteLayout title="Enfield NH Zoning Poll">
-    <div>
+    <div id="summary-div">
         <h2>Summary</h2>
-        <div id="summary-div"></div>
+        <div class="contents"></div>
     </div>
-    <div>
+    <div id="actual-change-div">
         <h2>Actual Change</h2>
-        <div id="actual-change-div"></div>
+        <div class="contents"></div>
+    </div>
+    <div id="voting-block">
+        <h2>Vote here</h2>
+        <div class="contents logged-in">
+            <div class="question"></div>
+            <div class="options"></div>
+        </div>
+        <div class="contents logged-out">
+            <div>In order to participate in the poll, you must tell us who you are.</div>
+            <div><button id="submit-identity">Submit Identity</button></div>
+        </div>
     </div>
 </SiteLayout>
 
@@ -25,15 +36,59 @@ import SiteLayout from "../layouts/layout.astro"
     async function loadPage() {
         const infoModel = await fetchGet<ActivePollModel>("active-poll")
 
-        // Display the data
-        const summaryDiv = $("#summary-div")
-        const actualChangeDiv = $("#actual-change-div")
-        if (infoModel == null) {
-            summaryDiv.html("")
-            actualChangeDiv.html("")
-        } else {
+        // Get the handles to the render locations
+        const summaryDiv = $("#summary-div .contents")
+        const actualChangeDiv = $("#actual-change-div .contents")
+        const votingBlock = $("#voting-block")
+
+        // Clear out the current contents
+        votingBlock.hide()
+        summaryDiv.html("")
+        actualChangeDiv.html("")
+
+        // If the poll is a zoning ammendment, populate that
+        if (infoModel != null && infoModel.type == "zoning-ammendment") {
+            votingBlock.show()
             summaryDiv.html(markdownToHtml(infoModel.summaryMarkdown))
             actualChangeDiv.html(markdownToHtml(infoModel.zoningText))
+
+            // Get ready to display the voting section    
+            const votingLoggedInBlock = $(".logged-in", votingBlock)
+            const votingLoggedOutBlock = $(".logged-out", votingBlock)
+
+            if (infoModel.poll.loggedIn) {
+                // Show and hide the right blocks
+                votingLoggedInBlock.show()
+                votingLoggedOutBlock.hide()
+
+                // Populate the options
+                const votingQuestionDiv = $(".options", votingLoggedInBlock)
+                votingQuestionDiv.html("")
+                infoModel.poll.votingOptions.forEach((value, index) => {
+                    const id = `voting-option-${index}`
+
+                    const input = $("<input>")
+                        .attr("type", "radio")
+                        .attr("id", id)
+                        .attr("name", "vote")
+                        .attr("value", value.value)
+
+                    const label = $("<label>")
+                        .attr("for", id)
+                        .append(input)
+                        .append(value.label)
+
+                    votingQuestionDiv.append(label)
+                })
+
+                // Populate the question
+                const votingAnswersDiv = $(".question", votingLoggedInBlock)
+                votingAnswersDiv.html(markdownToHtml(infoModel.poll.votingQuestion))
+            } else {
+                // Show and hide the right blocks
+                votingLoggedInBlock.hide()
+                votingLoggedOutBlock.show()
+            }
         }
     }
 

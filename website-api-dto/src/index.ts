@@ -8,6 +8,19 @@ export type PollCard = {
 }
 
 export type ActivePollModel = {
+    type: "zoning-ammendment"
     summaryMarkdown: string
     zoningText: string
+    poll: {
+        loggedIn: true
+        votingQuestion: string
+        votingOptions: VotingOption[]
+    } | {
+        loggedIn: false
+    }
+}
+
+export type VotingOption = {
+    value: string,
+    label: string,
 }
