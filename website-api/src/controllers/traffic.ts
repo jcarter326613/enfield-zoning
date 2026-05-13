@@ -1,5 +1,5 @@
 import { ControllerParameters } from "../routes/route-base.js"
-import { writeJsonFileToS3 } from "../services/s3-writter.js"
+import { writeJsonFileToS3 } from "../services/s3-writer.js"
 
 export class Traffic {
     readonly bucketName: string = "enfieldnhzoning-data"
