@@ -1,5 +1,7 @@
 import express, { CookieOptions } from "express"
 
+import { Authentication, Instance as AuthInstance } from "../services/authentication.js"
+
 export class Response {
     private jsonContent: any | null = null
     private stringContent: any | null = null
@@ -7,6 +9,8 @@ export class Response {
     private fileName: string | null = null
     private headers: Record<string, string> = {}
     private cookies: ResponseCookie[] = []
+    private neededNewAuthToken: string | null = null
+    private needClearAuthToken: boolean = false
     private statusCode: number | null = null
 
     setHeader(name: string, value: string) {
@@ -29,6 +33,14 @@ export class Response {
         this.cookies.push(cookie)
     }
 
+    setGenerateAuthToken(userId: string | null) {
+        if (userId == null) {
+            this.needClearAuthToken = true
+        } else {
+            this.neededNewAuthToken = userId
+        }
+    }
+
     setStatusCode(code: number) {
         this.statusCode = code
     }
@@ -43,6 +55,22 @@ export class Response {
 
         for (let header of Object.keys(this.headers)) {
             response.append(header, this.headers[header])
+        }
+
+        if (this.needClearAuthToken) {
+            response.clearCookie(Authentication.AUTHORIZATION_COOKIE_NAME)
+        } else if (this.neededNewAuthToken != null) {
+            const accessToken = await AuthInstance.generateAuthenticationToken(this.neededNewAuthToken)
+            response.cookie(
+                Authentication.AUTHORIZATION_COOKIE_NAME,
+                accessToken,
+                {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: "strict",
+                    maxAge: 1000 * 60 * 60 * 24 * Authentication.MAX_DAYS_REFRESH_TOKEN_AGE
+                }
+            )
         }
 
         for (let cookie of this.cookies) {

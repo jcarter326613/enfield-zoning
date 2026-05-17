@@ -12,11 +12,13 @@ import { S3Writer } from "./s3-writer.js"
 
 export class Authentication
 {
+    static readonly ACCESS_TOKEN_SECRET = "/enfieldnhzoning/website-api/access-token"
+    static readonly REFRESH_TOKEN_SECRET = "/enfieldnhzoning/website-api/refresh-token"
     static readonly AUTHORIZATION_COOKIE_NAME = "X-ENFIELDNHZONING-AUTHORIZATION"
-    static readonly REFRESH_TOKEN_PATH = "/v1/refreshTokens"
+    static readonly REFRESH_TOKEN_PATH = "v1/refreshTokens"
+    static readonly MAX_DAYS_REFRESH_TOKEN_AGE = 60
 
     private isInitialized: boolean = false
-    private integrationTokenSecret: string | undefined
 
     private accessTokenSigner: (payload: jwt.SignerPayload) => string
     private accessTokenVerifier: (token: jwt.Bufferable) => unknown
@@ -38,11 +40,13 @@ export class Authentication
         
         // Create a new refresh token, which is stored on S3
         const expirationDate = new Date()
-        expirationDate.setDate(expirationDate.getDate() + 60)
+        expirationDate.setDate(expirationDate.getDate() + Authentication.MAX_DAYS_REFRESH_TOKEN_AGE)
         const refreshTokenId = await this.s3Writter.writeJsonFileToS3<RefreshFileContents>({
             userId: userId,
             expiresAt: expirationDate.getTime()
-        }, Authentication.REFRESH_TOKEN_PATH, true)
+        }, Authentication.REFRESH_TOKEN_PATH, {
+            addUniqueSuffix: true
+        })
 
         const refreshTokenContents: RefreshContents = {
             a: refreshTokenId,
@@ -164,11 +168,11 @@ export class Authentication
         // Check that s3 has this refresh token recorded and that it isn't expirationDate
         const filePath = `${Authentication.REFRESH_TOKEN_PATH}/${refreshTokenExtracted.a}`
         const fileContents = await this.s3Writter.readJsonFileFromS3<RefreshFileContents>(filePath)
+        const nowEpoch = (new Date()).getTime()
         if (
             fileContents?.userId == userId &&
-            (fileContents?.expiresAt ?? 0) > (new Date()).getTime()
+            (fileContents?.expiresAt ?? 0) > nowEpoch
         ) {
-            await this.s3Writter.removeJsonFileFromS3(filePath)
             return true
         } else {
             return false
@@ -192,7 +196,7 @@ export class Authentication
             })
             this.refreshTokenSigner = jwt.createSigner({
                 key: refreshTokenSecret,
-                expiresIn: "60d"
+                expiresIn: `${Authentication.MAX_DAYS_REFRESH_TOKEN_AGE}d`
             })
             this.decoder = jwt.createDecoder()
             this.accessTokenVerifier = jwt.createVerifier({

@@ -4,16 +4,19 @@ import { Response } from "./response.js"
 import { TypedRequest } from "./typed-request.js"
 import { HttpError } from "../exceptions/http-error.js"
 import { HttpStatusCode } from "../http-status-code.js"
+import { Authentication } from "../services/authentication.js"
 
 export class RouteBase<T>
 {
     private app: express.Application
+    private authentication: Authentication
     controller: T
 
     constructor(app: express.Application, controller: T)
     {
         this.app = app
         this.controller = controller
+        this.authentication = new Authentication
     }
 
     protected setupGet<B>(
@@ -39,6 +42,17 @@ export class RouteBase<T>
         successCode: number,
         controller: (args: ControllerParameters<B>) => Response | any)
     {
+        // Perform the auth first
+        let authId: string | undefined
+        let needNewAuthToken = false
+        try {
+            const authResults = await this.authentication.verifyAuthentication(request)
+            authId = authResults.userId
+            needNewAuthToken = authResults.newTokenNeeded
+        } catch (e: any) {}
+
+        // Now run the command
+        let responseObj = new Response()
         try
         {
             let result = await controller.call(this.controller, {
@@ -47,12 +61,14 @@ export class RouteBase<T>
                 body: request.body,
                 ips: request.ips,
                 ip: request.ip ?? "",
+                loggedInUserId: authId
             })
             response.status(successCode)
+
             if (result instanceof Response) {
-                return await result.populateResponse(request, response)
+                responseObj = result
             } else {
-                return response.json(result)
+                responseObj.setJson(result)
             }
         }
         catch (e: any)
@@ -71,7 +87,19 @@ export class RouteBase<T>
             }
 
             const message = e?.message ?? e
-            return response.status(statusCode).json({errorMessage: message});
+            return response.status(statusCode).json({errorMessage: message})
+        }
+
+        // Try to return the object.  If this fails, just do a stripped down 500 error
+        if (needNewAuthToken && authId != null) {
+            responseObj.setGenerateAuthToken(authId)
+        }
+        try {
+            await responseObj.populateResponse(request, response)
+        } catch (e: any) {
+            console.error(e)
+            const message = e?.message ?? e
+            response.status(500).json({errorMessage: message})
         }
     }
 }
@@ -79,7 +107,8 @@ export class RouteBase<T>
 export type ControllerParameters<B> = {
     params: Record<string, string>,
     query: Record<string, string>, 
-    body: B, 
+    body: B,
     ips: string[],
     ip: string,
+    loggedInUserId: string | undefined,
 }

@@ -7,6 +7,12 @@ export type PollCard = {
     summary: string
 }
 
+export type AccountCreateModel = {
+    email: string,
+    legalName: string | undefined,
+    domicileStreet: string | undefined,
+}
+
 export type ActivePollModel = {
     type: "zoning-ammendment"
     summaryMarkdown: string

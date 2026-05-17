@@ -11,51 +11,80 @@ const s3 = new S3Client({})
 
 const bucketName: string = "enfieldnhzoning-data"
 
+type WriteJsonOptionsWithSuffix = {
+    addUniqueSuffix: true
+    allowOverwrite?: boolean
+}
+
+type WriteJsonOptionsWithoutSuffix = {
+    addUniqueSuffix?: false | undefined
+    allowOverwrite?: boolean
+}
+
 export class S3Writer {
     public async writeJsonFileToS3<T>(
         payload: T,
         filePath: string,
-        addUniqueSuffix: boolean = false
-    ): Promise<string | undefined> {
-        // Figure out the final filename
-        let fileName: string = ""
-        let uniqueSuffix: string | undefined
-        if (addUniqueSuffix) {
-            // If we are adding a unique suffix, loop until we generate a unique GUID (I'm just being safe)
-            let attemptCount = 0
-            while (attemptCount < 5) {
-                attemptCount++
-                uniqueSuffix = randomUUID()
-                fileName = `${filePath}/${uniqueSuffix}.json`
-                try {
-                    await s3.send(
-                        new HeadObjectCommand({
-                            Bucket: bucketName,
-                            Key: fileName,
-                        }),
-                    )
-                } catch (error: any) {
-                    if (error?.name == "NotFound") {
-                        break
+        opts: WriteJsonOptionsWithSuffix
+    ): Promise<string | undefined>
+
+    public async writeJsonFileToS3<T>(
+        payload: T,
+        filePath: string,
+        opts?: WriteJsonOptionsWithoutSuffix
+    ): Promise<true | undefined>
+
+    public async writeJsonFileToS3<T>(
+        payload: T,
+        filePath: string,
+        opts?: {
+            addUniqueSuffix?: boolean,
+            allowOverwrite?: boolean,
+        }
+    ): Promise<string | true | undefined> {
+        const maxAttempts = 5
+        let attemptCount = 0
+
+        while (attemptCount < maxAttempts) {
+            attemptCount++
+
+            const uniqueSuffix = (opts?.addUniqueSuffix === true) ? randomUUID() : true
+            const fileName = (opts?.addUniqueSuffix === true)
+                ? `${filePath}/${uniqueSuffix}.json`
+                : `${filePath}.json`
+
+            try {
+                const command = new PutObjectCommand({
+                    Bucket: bucketName,
+                    Key: fileName,
+                    Body: JSON.stringify(payload),
+                    ContentType: "application/json",
+                    ...((opts?.allowOverwrite === true) ? {} : { IfNoneMatch: "*" }),
+                })
+
+                await s3.send(command)
+
+                // Success
+                return uniqueSuffix
+            } catch (error: any) {
+                // 412 Precondition Failed means the object already exists
+                if (error?.$metadata?.httpStatusCode === 412) {
+                    // If we're not generating unique names, there is nothing else to try
+                    if (!(opts?.addUniqueSuffix === true)) {
+                        return undefined
                     }
+
+                    // Otherwise, generate another UUID and try again
+                    continue
                 }
+
+                // Any other error should be propagated
+                throw error
             }
-        } else {
-            fileName = `${filePath}.json`
         }
 
-        // Write the contents to s3
-        await s3.send(
-            new PutObjectCommand({
-                Bucket: bucketName,
-                Key: fileName,
-                Body: JSON.stringify(payload),
-                ContentType: "application/json",
-            }),
-        )
-
-        // Return the unique suffix if there was one
-        return uniqueSuffix
+        // Failed to generate a unique filename after several attempts
+        return undefined
     }
 
     public async readJsonFileFromS3<T>(
