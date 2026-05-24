@@ -25,6 +25,12 @@ const { title = "Enfield NH Zoning" } = Astro.props
                 <div>
                     <h1>Enfield NH Zoning</h1>
                 </div>
+
+                <nav class="auth-actions" aria-label="Account actions">
+                    <a class="button-primary signin" href="/sign-in">Sign in</a>
+                    <a class="button-primary create" href="/sign-up">Create account</a>
+                    <a class="button-primary logout" href="/create-account">Logout</a>
+                </nav>
             </header>
 
             <main class="content-wrap">
@@ -39,3 +45,30 @@ const { title = "Enfield NH Zoning" } = Astro.props
         </div>
     </body>
 </html>
+
+<script>
+    import type { Account } from "@enfield-zoning/website-api-dto"
+
+    import { fetchGet } from "../scripts/fetch"
+
+    const signinButton = document.querySelector<HTMLElement>(".auth-actions .signin")
+    const createButton = document.querySelector<HTMLElement>(".auth-actions .create")
+    const logoutButton = document.querySelector<HTMLButtonElement>(".auth-actions .logout")
+
+    async function updateAuthButtons() {
+        if (!signinButton || !createButton || !logoutButton) {
+            return
+        }
+
+        const response = await fetchGet<Account.AuthStatus>("authstatus")
+
+        if (response?.isLoggedIn) {
+            logoutButton.style.display = "inline-flex"
+        } else {
+            signinButton.style.display = "inline-flex"
+            createButton.style.display = "inline-flex"
+        }
+    }
+
+    updateAuthButtons()
+</script>

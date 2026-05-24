@@ -51,8 +51,7 @@ import SiteLayout from "../layouts/layout.astro"
 <script>
     import $ from "jquery"
     import type { 
-        ActivePollModel,
-        SubmitIdentityRequest,
+        Poll,
     } from "@enfield-zoning/website-api-dto"
 
     import { fetchGet, fetchPost } from "../scripts/fetch"
@@ -66,7 +65,7 @@ import SiteLayout from "../layouts/layout.astro"
     }
 
     async function loadPage() {
-        const infoModel = await fetchGet<ActivePollModel>("active-poll")
+        const infoModel = await fetchGet<Poll.ActivePollModel>("active-poll")
 
         // Get the handles to the render locations
         const summaryDiv = $("#summary-div .contents")
@@ -130,7 +129,7 @@ import SiteLayout from "../layouts/layout.astro"
         const streetInput = $("#identity-street", formDiv)
 
         try {
-            await fetchPost<SubmitIdentityRequest, void>("identity", {
+            await fetchPost<Poll.SubmitIdentityRequest, void>("identity", {
                 name: nameInput.text(),
                 street: streetInput.text()
             })

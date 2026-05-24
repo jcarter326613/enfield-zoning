@@ -3,7 +3,7 @@ import { HttpStatusCode } from "../http-status-code.js"
 import { ControllerParameters } from "../routes/route-base.js"
 import { User as UserService } from "../services/user.js"
 import { Response } from "../routes/response.js"
-import { AccountCreateModel } from "@enfield-zoning/website-api-dto"
+import { Account as AccountDto } from "@enfield-zoning/website-api-dto"
 
 export class Account {
     readonly userService: UserService
@@ -12,7 +12,13 @@ export class Account {
         this.userService = new UserService
     }
 
-    public async create(args: ControllerParameters<AccountCreateModel>): Promise<Response> {
+    public async authstatus(args: ControllerParameters<void>): Promise<AccountDto.AuthStatus> {
+        return {
+            isLoggedIn: args.loggedInUserId != null
+        }
+    }
+
+    public async create(args: ControllerParameters<AccountDto.AccountCreateModel>): Promise<Response> {
         // Create a user
         const result = await this.userService.createUser(args.body)
 

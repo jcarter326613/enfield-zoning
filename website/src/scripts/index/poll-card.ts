@@ -1,8 +1,8 @@
 import $ from "jquery"
 
-import type { PollCard } from "@enfield-zoning/website-api-dto"
+import type { Home } from "@enfield-zoning/website-api-dto"
 
-export function createPollCard(template: JQuery<HTMLElement>, detail: PollCard): JQuery<HTMLElement> {
+export function createPollCard(template: JQuery<HTMLElement>, detail: Home.PollCard): JQuery<HTMLElement> {
     if (!template) {
         throw new Error("Poll card template was not found.")
     }

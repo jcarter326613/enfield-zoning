@@ -1,12 +1,12 @@
 import { ControllerParameters } from "../routes/route-base.js"
-import { ActivePollModel, VotingOption } from "@enfield-zoning/website-api-dto"
+import { Poll } from "@enfield-zoning/website-api-dto"
 
 export class ActivePoll {
-    public async index(args: ControllerParameters<any>): Promise<ActivePollModel> {
+    public async index(args: ControllerParameters<any>): Promise<Poll.ActivePollModel> {
         let pollObject: {
             loggedIn: true
             votingQuestion: string
-            votingOptions: VotingOption[]
+            votingOptions: Poll.VotingOption[]
         } | {
             loggedIn: false
         }

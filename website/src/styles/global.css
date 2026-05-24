@@ -239,3 +239,30 @@ h2.section-title {
         padding: 1.1rem;
     }
 }
+
+.auth-actions {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+.auth-actions a {
+    display: none;
+}
+
+.button-secondary {
+    border: 1px solid var(--border);
+    background: var(--panel-strong);
+    color: var(--accent);
+}
+
+.button-secondary:hover {
+    background: var(--accent-soft);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 720px) {
+    .auth-actions {
+        flex-wrap: wrap;
+    }
+}

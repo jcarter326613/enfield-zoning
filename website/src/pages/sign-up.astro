@@ -1,0 +1,118 @@
+---
+import "../styles/global.css"
+import "../styles/sign-up.css"
+
+import SiteLayout from "../layouts/layout.astro"
+---
+
+<SiteLayout title="Create Account | Enfield NH Zoning">
+    <main class="signup-page">
+        <section class="signup-header">
+            <h1>Create account</h1>
+            <p>
+                Create an account to participate in discussion. Add optional polling
+                information only if you want to participate in polls.
+            </p>
+        </section>
+
+        <form class="signup-form" method="post" action="/sign-up-validation">
+            <div class="signup-grid">
+                <section class="signup-panel">
+                    <h2>Required account information</h2>
+
+                    <label>
+                        Email
+                        <input
+                            id="email-input"
+                            name="email"
+                            type="email"
+                            autocomplete="email"
+                            required
+                        />
+
+                        <div id="email-error" class="field-error">
+                            Enter a valid email address.
+                        </div>
+                    </label>
+                </section>
+
+                <section class="signup-panel optional-panel">
+                    <p class="optional-label">Optional</p>
+                    <h2>Polling information</h2>
+
+                    <label>
+                        Name
+                        <input name="pollingName" type="text" autocomplete="name" />
+                    </label>
+
+                    <label>
+                        Enfield address
+                        <input name="pollingAddress" type="text" autocomplete="street-address" />
+                    </label>
+                </section>
+            </div>
+
+            <section class="signup-submit-panel">
+                <p>
+                    After submitting, we’ll send you a verification link by email.
+                    You’ll need to verify your email address before posting comments.
+                </p>
+
+                <button class="button button-primary" type="submit">
+                    Create account
+                </button>
+            </section>
+        </form>
+    </main>
+</SiteLayout>
+
+<script>
+    import $ from "jquery"
+
+    const emailInput = $("#email-input")
+    const emailError = $("#email-error")
+
+    emailError.hide()
+
+    emailInput.on("blur", () => {
+        const email = emailInput.val()?.toString().trim() ?? ""
+
+        if (email.length === 0) {
+            emailError.hide()
+            return
+        }
+
+        if (!isValidEmail(email)) {
+            emailError.show()
+        }
+    })
+
+    emailInput.on("focus", () => {
+        emailError.hide()
+    })
+
+    $(".signup-form").on("submit", event => {
+        const email = emailInput.val()?.toString().trim() ?? ""
+        const pollingName = $("[name='pollingName']").val()?.toString().trim() ?? ""
+        const pollingAddress = $("[name='pollingAddress']").val()?.toString().trim() ?? ""
+
+        if (!isValidEmail(email)) {
+            event.preventDefault()
+            emailError.show()
+            emailInput.trigger("focus")
+            return
+        }
+
+        if ((pollingName && !pollingAddress) || (!pollingName && pollingAddress)) {
+            event.preventDefault()
+
+            alert(
+                "To request polling access, enter both your name and Enfield address. Otherwise leave both polling fields blank."
+            )
+        }
+    })
+
+    function isValidEmail(email: string): boolean {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    }
+</script>
