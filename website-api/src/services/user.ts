@@ -1,13 +1,23 @@
 import { randomUUID } from "node:crypto"
 import { S3Writer } from "./s3-writer.js"
+import { HttpError } from "../exceptions/http-error.js"
+import { HttpStatusCode } from "../http-status-code.js"
 
 export class User {
     static readonly S3_USER_PATH = "v1/users"
     static readonly S3_USER_BYID_PATH = "v1/users/byId"
     static readonly S3_USER_BYEMAIL_PATH = "v1/users/byEmail"
+    static readonly S3_LOGIN_TOKEN_PATH = "v1/users/loginTokens"
 
     readonly s3Writter: S3Writer = new S3Writer
 
+    // Static publics
+    static isUserAlllowedToVote(userDto: UserDto): boolean {
+        return userDto.suppliedLegalName != null && userDto.suppliedLegalName.length > 0 &&
+            userDto.suppliedDomicileStreet != null && userDto.suppliedDomicileStreet.length > 0
+    }
+
+    // Publics
     async createUser(args: {
         email: string,
         legalName: string | undefined,
@@ -48,6 +58,30 @@ export class User {
         // Report success
         return userId
     }
+
+    async getUser(id: string): Promise<UserDto | undefined> {
+        const path = `${User.S3_USER_BYID_PATH}/${id}`
+        return await this.s3Writter.readJsonFileFromS3<UserDto>(path)
+    }
+
+    async getUserIdByEmail(email: string): Promise<string | undefined> {
+        const byEmailPath = `${User.S3_USER_BYEMAIL_PATH}/${encodeURIComponent(email)}`
+        const emailReserveResult = await this.s3Writter.readJsonFileFromS3<ByEmailDto>(byEmailPath)
+        return emailReserveResult?.id
+    }
+
+    async getLoginToken(userId: string): Promise<LoginTokenDto | undefined> {
+        const path = `${User.S3_LOGIN_TOKEN_PATH}/${userId}`
+        return this.s3Writter.readJsonFileFromS3<LoginTokenDto>(path)
+    }
+}
+
+type ByEmailDto = {
+    id: string
+}
+
+type LoginTokenDto = {
+    issuedEpoch: number
 }
 
 type UserDto = {
@@ -61,8 +95,4 @@ type UserDto = {
     suppliedLegalName: string | undefined,
     suppliedDomicileStreet: string | undefined,
     registeredVoterId: string | undefined,
-}
-
-type ByEmailDto = {
-    id: string
 }

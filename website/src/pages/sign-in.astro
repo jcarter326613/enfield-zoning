@@ -1,0 +1,108 @@
+---
+import "../styles/global.css"
+import "../styles/sign-in.css"
+
+import SiteLayout from "../layouts/layout.astro"
+---
+
+<SiteLayout title="Sign in | Enfield NH Zoning">
+    <main class="signin-page">
+        <section class="signin-header">
+            <h1>Sign In</h1>
+            <p>
+                To sign in, enter the email address of an existing account below.
+            </p>
+        </section>
+            <form class="signin-form" method="post" action="/api/accounts/login">
+                <section class="signin-panel">
+                    <label>
+                        Email
+                        <input
+                            id="email-input"
+                            name="email"
+                            type="email"
+                            autocomplete="email"
+                            required
+                        />
+
+                        <div id="email-error" class="field-error">
+                            Enter a valid email address.
+                        </div>
+                    </label>
+                </section>
+
+                <section class="login-submit-panel">
+                    <p>
+                        After submitting, we’ll send you a sign-in link by email.
+                        Click that link to finish signing in.
+                    </p>
+
+                    <button class="button button-primary" type="submit">
+                        Sign in
+                    </button>
+                </section>
+            </form>
+            <div class="error" id="email-missing-error" style="display:none;">
+                That email is not asociated with an active account.  Please enter the correct email, or <a href="/signup">sign up</a> if you have not already done so.
+            </div>
+        </section>
+    </main>
+</SiteLayout>
+
+<script>
+    import $ from "jquery"
+
+    import { Account } from "@enfield-zoning/website-api-dto"
+
+    import { fetchPost } from "../scripts/fetch"
+
+    const emailInput = $("#email-input")
+    const emailError = $("#email-error")
+
+    emailError.hide()
+
+    emailInput.on("blur", () => {
+        const email = emailInput.val()?.toString().trim() ?? ""
+
+        if (email.length === 0) {
+            emailError.hide()
+            return
+        }
+
+        if (!isValidEmail(email)) {
+            emailError.show()
+        }
+    })
+
+    emailInput.on("focus", () => {
+        emailError.hide()
+    })
+
+    $(".signin-form").on("submit", async event => {
+        const email = emailInput.val()?.toString().trim() ?? ""
+
+        if (!isValidEmail(email)) {
+            event.preventDefault()
+            emailError.show()
+            emailInput.trigger("focus")
+        }
+
+        const response = await fetchPost<Account.LoginRequest, Account.LoginResponse>("identity", {
+            email: email
+        })
+
+        if (response == null) {
+            
+        } else if (response?.emailSent) {
+
+        } else if (response?.throttled) {
+
+        } else if (response?.notFound) {
+
+        }
+    })
+
+    function isValidEmail(email: string): boolean {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    }
+</script>

@@ -19,9 +19,13 @@ import SiteLayout from "../layouts/layout.astro"
             <div class="question"></div>
             <div class="options"></div>
         </div>
-        <div class="contents logged-out">
+        <div class="contents voting-not-allowed">
             <div>In order to participate in the poll, you must tell us who you are.</div>
             <div><button id="start-submit-identity">Submit Identity</button></div>
+        </div>
+        <div class="contents logged-out">
+            <div>You must be signed in and identified to participate in polling.</div>
+            <div><a class="button-primary signin" href="/sign-in">Sign in</a></div>
         </div>
     </div>
     <div id="identity-submission" style="display:none;">
@@ -86,11 +90,23 @@ import SiteLayout from "../layouts/layout.astro"
             // Get ready to display the voting section    
             const votingLoggedInBlock = $(".logged-in", votingBlock)
             const votingLoggedOutBlock = $(".logged-out", votingBlock)
+            const votingNotAllowedBlock = $(".voting-not-allowed", votingBlock)
 
-            if (infoModel.poll.loggedIn) {
+            if (!infoModel.poll.loggedIn) {
+                // Show and hide the right blocks
+                votingLoggedInBlock.hide()
+                votingLoggedOutBlock.show()
+                votingNotAllowedBlock.hide()
+            } else if (!infoModel.poll.allowedToVote) {
+                // Show and hide the right blocks
+                votingLoggedInBlock.hide()
+                votingLoggedOutBlock.hide()
+                votingNotAllowedBlock.show()
+            } else {
                 // Show and hide the right blocks
                 votingLoggedInBlock.show()
                 votingLoggedOutBlock.hide()
+                votingNotAllowedBlock.hide()
 
                 // Populate the options
                 const votingQuestionDiv = $(".options", votingLoggedInBlock)
@@ -115,10 +131,6 @@ import SiteLayout from "../layouts/layout.astro"
                 // Populate the question
                 const votingAnswersDiv = $(".question", votingLoggedInBlock)
                 votingAnswersDiv.html(markdownToHtml(infoModel.poll.votingQuestion))
-            } else {
-                // Show and hide the right blocks
-                votingLoggedInBlock.hide()
-                votingLoggedOutBlock.show()
             }
         }
     }
@@ -128,15 +140,15 @@ import SiteLayout from "../layouts/layout.astro"
         const nameInput = $("#identity-name", formDiv)
         const streetInput = $("#identity-street", formDiv)
 
-        try {
+        //try {
             await fetchPost<Poll.SubmitIdentityRequest, void>("identity", {
                 name: nameInput.text(),
                 street: streetInput.text()
             })
             loadPage()
-        } catch (e: any) {
+        //} catch (e: any) {
             // Display an error
-        }
+        //}
     }
 
     connectButtons()

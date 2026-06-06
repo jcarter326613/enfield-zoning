@@ -1,30 +1,41 @@
 import { ControllerParameters } from "../routes/route-base.js"
 import { Poll } from "@enfield-zoning/website-api-dto"
+import { User } from "../services/user.js"
 
 export class ActivePoll {
-    public async index(args: ControllerParameters<any>): Promise<Poll.ActivePollModel> {
-        let pollObject: {
-            loggedIn: true
-            votingQuestion: string
-            votingOptions: Poll.VotingOption[]
-        } | {
-            loggedIn: false
-        }
+    private userService = new User
 
+    public async index(args: ControllerParameters<any>): Promise<Poll.ActivePollModel> {
+        let pollObject: Poll.Poll
+        
         if (args.loggedInUserId != null) {
-            pollObject = {
-                loggedIn: true,
-                votingQuestion: "What is your favorite color?",
-                votingOptions: [{
-                    label: "Green",
-                    value: "green",
-                }, {
-                    label: "Blue",
-                    value: "blue"
-                }, {
-                    label: "Red",
-                    value: "red"
-                }]
+            let isAllowedToVote = false
+            let userDto = await this.userService.getUser(args.loggedInUserId)
+            if (userDto != null) {
+                isAllowedToVote = User.isUserAlllowedToVote(userDto)
+            }
+
+            if (!isAllowedToVote) {
+                pollObject = {
+                    loggedIn: true,
+                    allowedToVote: false,
+                }
+            } else {
+                pollObject = {
+                    loggedIn: true,
+                    allowedToVote: true,
+                    votingQuestion: "What is your favorite color?",
+                    votingOptions: [{
+                        label: "Green",
+                        value: "green",
+                    }, {
+                        label: "Blue",
+                        value: "blue"
+                    }, {
+                        label: "Red",
+                        value: "red"
+                    }]
+                }
             }
         } else {
             pollObject = {
