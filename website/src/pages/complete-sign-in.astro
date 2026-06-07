@@ -27,8 +27,8 @@ import SiteLayout from "../layouts/layout.astro"
     async function completeLogin(): Promise<void> {
         const queryParams = new URLSearchParams(window.location.search)
 
-        const userId = queryParams.get("userId")
-        const token = queryParams.get("token")
+        const userId = queryParams.get("u")
+        const token = queryParams.get("t")
 
         if (!userId || !token) {
             showExpired()
@@ -42,14 +42,14 @@ import SiteLayout from "../layouts/layout.astro"
 
         try {
             const response = await fetchPost<Account.CompleteLoginRequest, Account.CompleteLoginResponse>(
-                "/account/complete-login",
+                "account/complete-login",
                 request
             )
 
             if (response == null) {
                 showExpired()
             } else {
-                window.location.href = response.redirectUrl
+                //window.location.href = response.redirectUrl
             }
         } catch {
             showExpired()

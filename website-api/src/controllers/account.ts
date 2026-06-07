@@ -10,6 +10,8 @@ import { ControllerParameters } from "../routes/route-base.js"
 import { User as UserService } from "../services/user.js"
 import { Response } from "../routes/response.js"
 
+const DOMAIN = process.env.DOMAIN
+
 export class Account {
     readonly userService: UserService
     readonly msLoginTokenTimeout = 5 * 60 * 1000
@@ -130,6 +132,8 @@ export class Account {
         userId: string,
         key: string,
     }) {
+        const loginLink = `${DOMAIN}/complete-sign-in?u=${args.userId}&t=${args.key}`
+
         const sender = {
             email: "noreply@enfieldnhzoning.org",
             name: "Enfield NH Zoning",
@@ -141,8 +145,10 @@ export class Account {
         await this.mailtrapClient.send({
             from: sender,
             to: recipients,
-            subject: "You are awesome!",
-            text: "Congrats for sending test email with Mailtrap!",
+            subject: "Enfield NH Zoning Login",
+            html: `To complete the login process, click the link below.<br /><br /><a href="${loginLink}">Complete Login</a>
+                <br /><br />If the link does not work, you can set your browser to the following URL: ${loginLink}`,
+            text: `To complete the login process, please visit the following url in your browser:\r\n\r\n${loginLink}`,
             category: "Integration Test",
         })
     }

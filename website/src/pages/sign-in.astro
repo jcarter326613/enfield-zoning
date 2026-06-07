@@ -68,7 +68,7 @@ import SiteLayout from "../layouts/layout.astro"
     const emailInput = $("#email-input")
     const emailError = $("#email-error")
     const emailNotFound = $("#email-missing-error")
-    const emailThrottled = $("#email-error")
+    const emailThrottled = $("#email-throttled-error")
     const emailUnknownError = $("#email-unknown-error")
 
     emailInput.on("blur", () => {
@@ -111,7 +111,7 @@ import SiteLayout from "../layouts/layout.astro"
         if (response == null) {
             emailUnknownError.show()
         } else if (response?.emailSent) {
-
+            window.location.href = "/sign-in-sent"
         } else if (response?.throttled) {
             emailThrottled.show()
         } else if (response?.notFound) {

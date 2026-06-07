@@ -34,9 +34,10 @@ const currentPath = Astro.url.pathname
                         <SignInButton redirectUrl={
                             (
                                 currentPath != "/" &&
+                                currentPath != "/complete-sign-in" &&
+                                currentPath != "/sign-in-sent" &&
                                 currentPath != "/sign-up" &&
-                                currentPath != "/sign-up-validation" &&
-                                currentPath != "/complete-sign-in"
+                                currentPath != "/sign-up-validation"
                             ) ? currentPath : undefined} />
                     }
                     {(currentPath == "/sign-up") ? <></> : 
