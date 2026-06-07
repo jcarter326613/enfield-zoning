@@ -43,7 +43,7 @@ const currentPath = Astro.url.pathname
                     {(currentPath == "/sign-up") ? <></> : 
                         <a class="button-primary create" href="/sign-up">Create account</a>
                     }
-                    <a class="button-primary logout" href="/create-account">Logout</a>
+                    <button class="button-primary logout" type="button">Logout</a>
                 </nav>
             </header>
 
@@ -64,7 +64,7 @@ const currentPath = Astro.url.pathname
     import $ from "jquery"
     import type { Account } from "@enfield-zoning/website-api-dto"
 
-    import { fetchGet } from "../scripts/fetch"
+    import { fetchGet, fetchPost } from "../scripts/fetch"
 
     const signinButton = $(".auth-actions .signin")
     const createButton = $(".auth-actions .create")
@@ -82,4 +82,16 @@ const currentPath = Astro.url.pathname
     }
 
     updateAuthButtons()
+
+    logoutButton.on("click", async event => {
+        event.preventDefault()
+        event.stopPropagation()
+
+        try {
+            await fetchGet("account/logout")
+            window.location.reload()
+        } catch (error) {
+            console.error("Logout failed", error)
+        }
+    })
 </script>

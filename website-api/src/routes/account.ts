@@ -19,5 +19,6 @@ export class Account extends RouteBase<AccountController>
         this.setupPost<AccountDto.AccountCreateRequest>("/account/create", this.controller.create, HttpStatusCode.OK)
         this.setupPost<AccountDto.LoginRequest>("/account/login", this.controller.startLogin, HttpStatusCode.OK)
         this.setupPost<AccountDto.CompleteLoginRequest>("/account/complete-login", this.controller.completeLogin, HttpStatusCode.OK)
+        this.setupGet("/account/logout", this.controller.logout)
     }
 }

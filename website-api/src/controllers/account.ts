@@ -127,6 +127,12 @@ export class Account {
         }
     }
 
+    public async logout(args: ControllerParameters<void>): Promise<Response> {
+        const response = new Response
+        response.setGenerateAuthToken(null)
+        return response
+    }
+
     private async sendLoginEmail(args: {
         email: string,
         userId: string,

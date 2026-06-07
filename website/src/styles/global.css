@@ -246,7 +246,8 @@ h2.section-title {
     align-items: center;
 }
 
-.auth-actions a {
+.auth-actions a,
+.auth-actions button {
     display: none;
 }
 

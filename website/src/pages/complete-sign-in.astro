@@ -49,7 +49,7 @@ import SiteLayout from "../layouts/layout.astro"
             if (response == null) {
                 showExpired()
             } else {
-                //window.location.href = response.redirectUrl
+                window.location.href = response.redirectUrl
             }
         } catch {
             showExpired()
