@@ -99,13 +99,17 @@ import SiteLayout from "../layouts/layout.astro"
 
         const email = emailInput.val()?.toString().trim() ?? ""
 
+        const params = new URLSearchParams(window.location.search)
+        const redirectUrl = params.get("r") ?? undefined
+
         if (!isValidEmail(email)) {
             emailError.show()
             return false
         }
 
         const response = await fetchPost<Account.LoginRequest, Account.LoginResponse>("account/login", {
-            email: email
+            email: email,
+            redirectUrl: redirectUrl
         })
 
         if (response == null) {
