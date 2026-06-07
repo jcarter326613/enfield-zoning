@@ -1,11 +1,14 @@
 ---
 import "../styles/global.css"
 
+import SignInButton from "../components/sign-in-button.astro"
+
 interface Props {
     title?: string
 }
 
 const { title = "Enfield NH Zoning" } = Astro.props
+const currentPath = Astro.url.pathname
 ---
 
 <!doctype html>
@@ -27,8 +30,18 @@ const { title = "Enfield NH Zoning" } = Astro.props
                 </div>
 
                 <nav class="auth-actions" aria-label="Account actions">
-                    <a class="button-primary signin" href="/sign-in">Sign in</a>
-                    <a class="button-primary create" href="/sign-up">Create account</a>
+                    {(currentPath == "/sign-in") ? <></> : 
+                        <SignInButton redirectUrl={
+                            (
+                                currentPath != "/" &&
+                                currentPath != "/sign-up" &&
+                                currentPath != "/sign-up-validation" &&
+                                currentPath != "/complete-sign-in"
+                            ) ? currentPath : undefined} />
+                    }
+                    {(currentPath == "/sign-up") ? <></> : 
+                        <a class="button-primary create" href="/sign-up">Create account</a>
+                    }
                     <a class="button-primary logout" href="/create-account">Logout</a>
                 </nav>
             </header>
@@ -47,26 +60,23 @@ const { title = "Enfield NH Zoning" } = Astro.props
 </html>
 
 <script>
+    import $ from "jquery"
     import type { Account } from "@enfield-zoning/website-api-dto"
 
     import { fetchGet } from "../scripts/fetch"
 
-    const signinButton = document.querySelector<HTMLElement>(".auth-actions .signin")
-    const createButton = document.querySelector<HTMLElement>(".auth-actions .create")
-    const logoutButton = document.querySelector<HTMLButtonElement>(".auth-actions .logout")
+    const signinButton = $(".auth-actions .signin")
+    const createButton = $(".auth-actions .create")
+    const logoutButton = $(".auth-actions .logout")
 
     async function updateAuthButtons() {
-        if (!signinButton || !createButton || !logoutButton) {
-            return
-        }
-
         const response = await fetchGet<Account.AuthStatus>("authstatus")
 
         if (response?.isLoggedIn) {
-            logoutButton.style.display = "inline-flex"
+            logoutButton.css("display", "inline-flex")
         } else {
-            signinButton.style.display = "inline-flex"
-            createButton.style.display = "inline-flex"
+            signinButton.css("display", "inline-flex")
+            createButton.css("display", "inline-flex")
         }
     }
 

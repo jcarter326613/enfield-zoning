@@ -13,7 +13,7 @@ import SiteLayout from "../layouts/layout.astro"
                 To sign in, enter the email address of an existing account below.
             </p>
         </section>
-            <form class="signin-form" method="post" action="/api/accounts/login">
+            <form class="signin-form">
                 <section class="signin-panel">
                     <label>
                         Email
@@ -25,8 +25,20 @@ import SiteLayout from "../layouts/layout.astro"
                             required
                         />
 
-                        <div id="email-error" class="field-error">
+                        <div id="email-error" class="field-error" style="display:none;">
                             Enter a valid email address.
+                        </div>
+                        <div id="email-missing-error" class="field-error" style="display:none;">
+                            That email is not associated with an active account. 
+                            Please enter the correct email, or <a href="/sign-up">sign up</a> if you have not
+                            already done so.
+                        </div>
+                        <div id="email-throttled-error" class="field-error" style="display:none;">
+                            You have already requested a login email be sent.  Please check your email and click
+                            the link we sent to complete the login process.
+                        </div>
+                        <div id="email-unknown-error" class="field-error" style="display:none;">
+                            There was an error logging you in.  Please try again later.
                         </div>
                     </label>
                 </section>
@@ -42,9 +54,6 @@ import SiteLayout from "../layouts/layout.astro"
                     </button>
                 </section>
             </form>
-            <div class="error" id="email-missing-error" style="display:none;">
-                That email is not asociated with an active account.  Please enter the correct email, or <a href="/signup">sign up</a> if you have not already done so.
-            </div>
         </section>
     </main>
 </SiteLayout>
@@ -58,8 +67,9 @@ import SiteLayout from "../layouts/layout.astro"
 
     const emailInput = $("#email-input")
     const emailError = $("#email-error")
-
-    emailError.hide()
+    const emailNotFound = $("#email-missing-error")
+    const emailThrottled = $("#email-error")
+    const emailUnknownError = $("#email-unknown-error")
 
     emailInput.on("blur", () => {
         const email = emailInput.val()?.toString().trim() ?? ""
@@ -79,27 +89,36 @@ import SiteLayout from "../layouts/layout.astro"
     })
 
     $(".signin-form").on("submit", async event => {
+        event.preventDefault()
+        event.stopPropagation()
+
+        emailError.hide()
+        emailThrottled.hide()
+        emailNotFound.hide()
+        emailUnknownError.hide()
+
         const email = emailInput.val()?.toString().trim() ?? ""
 
         if (!isValidEmail(email)) {
-            event.preventDefault()
             emailError.show()
-            emailInput.trigger("focus")
+            return false
         }
 
-        const response = await fetchPost<Account.LoginRequest, Account.LoginResponse>("identity", {
+        const response = await fetchPost<Account.LoginRequest, Account.LoginResponse>("account/login", {
             email: email
         })
 
         if (response == null) {
-            
+            emailUnknownError.show()
         } else if (response?.emailSent) {
 
         } else if (response?.throttled) {
-
+            emailThrottled.show()
         } else if (response?.notFound) {
-
+            emailNotFound.show()
         }
+
+        return false
     })
 
     function isValidEmail(email: string): boolean {

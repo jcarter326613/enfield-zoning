@@ -3,6 +3,7 @@ import "../styles/global.css"
 import "../styles/sign-up.css"
 
 import SiteLayout from "../layouts/layout.astro"
+import SignInButton from "../components/sign-in-button.astro"
 ---
 
 <SiteLayout title="Create Account | Enfield NH Zoning">
@@ -15,7 +16,7 @@ import SiteLayout from "../layouts/layout.astro"
             </p>
         </section>
 
-        <form class="signup-form" method="post" action="/sign-up-validation">
+        <form class="signup-form">
             <div class="signup-grid">
                 <section class="signup-panel">
                     <h2>Required account information</h2>
@@ -58,6 +59,14 @@ import SiteLayout from "../layouts/layout.astro"
                     You’ll need to verify your email address before posting comments.
                 </p>
 
+                <div id="error-processing" class="field-error" style="display:none;">
+                    There was an error processing your request.  Please try again later.
+                </div>
+
+                <div id="error-duplicate" class="field-error" style="display:none;">
+                    The supplied email is already associated with an account.  To sign in, visit the <SignInButton /> page.
+                </div>
+
                 <button class="button button-primary" type="submit">
                     Create account
                 </button>
@@ -69,8 +78,14 @@ import SiteLayout from "../layouts/layout.astro"
 <script>
     import $ from "jquery"
 
+    import { Account } from "@enfield-zoning/website-api-dto"
+
+    import { fetchPost } from "../scripts/fetch"
+
     const emailInput = $("#email-input")
     const emailError = $("#email-error")
+    const errorProcessing = $("#error-processing")
+    const errorDuplicate = $("#error-duplicate")
 
     emailError.hide()
 
@@ -91,13 +106,17 @@ import SiteLayout from "../layouts/layout.astro"
         emailError.hide()
     })
 
-    $(".signup-form").on("submit", event => {
+    $(".signup-form").on("submit", async event => {
+        event.preventDefault()
+        event.stopPropagation()
+        errorProcessing.hide()
+        errorDuplicate.hide()
+
         const email = emailInput.val()?.toString().trim() ?? ""
         const pollingName = $("[name='pollingName']").val()?.toString().trim() ?? ""
         const pollingAddress = $("[name='pollingAddress']").val()?.toString().trim() ?? ""
 
         if (!isValidEmail(email)) {
-            event.preventDefault()
             emailError.show()
             emailInput.trigger("focus")
             return
@@ -109,6 +128,21 @@ import SiteLayout from "../layouts/layout.astro"
             alert(
                 "To request polling access, enter both your name and Enfield address. Otherwise leave both polling fields blank."
             )
+        }
+
+        // Send the account creation request to the server
+        const response = await fetchPost<Account.AccountCreateRequest, Account.AccountCreateResponse>("account/create", {
+            email: email,
+            legalName: pollingName,
+            domicileStreet: pollingAddress
+        })
+
+        if (response?.success) {
+            window.location.href = "/sign-up-validation"
+        } else if (response?.isDuplicate) {
+            errorDuplicate.show()
+        } else {
+            errorProcessing.show()
         }
     })
 

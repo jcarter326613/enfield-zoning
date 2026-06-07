@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto"
+import { randomUUID, randomBytes } from "node:crypto"
 import { S3Writer } from "./s3-writer.js"
 import { HttpError } from "../exceptions/http-error.js"
 import { HttpStatusCode } from "../http-status-code.js"
@@ -12,9 +12,13 @@ export class User {
     readonly s3Writter: S3Writer = new S3Writer
 
     // Static publics
-    static isUserAlllowedToVote(userDto: UserDto): boolean {
+    static isUserAllowedToVote(userDto: UserDto): boolean {
         return userDto.suppliedLegalName != null && userDto.suppliedLegalName.length > 0 &&
             userDto.suppliedDomicileStreet != null && userDto.suppliedDomicileStreet.length > 0
+    }
+
+    static isTokenValid(token: LoginTokenDto, key: string) {
+
     }
 
     // Publics
@@ -66,13 +70,45 @@ export class User {
 
     async getUserIdByEmail(email: string): Promise<string | undefined> {
         const byEmailPath = `${User.S3_USER_BYEMAIL_PATH}/${encodeURIComponent(email)}`
-        const emailReserveResult = await this.s3Writter.readJsonFileFromS3<ByEmailDto>(byEmailPath)
-        return emailReserveResult?.id
+        try {
+            const emailReserveResult = await this.s3Writter.readJsonFileFromS3<ByEmailDto>(byEmailPath)
+            return emailReserveResult?.id
+        } catch (e: any) {
+            return undefined
+        }
+    }
+
+    async createLoginToken(args: {
+        userId: string,
+        redirectUrl: string,
+    }): Promise<string> {
+        const key = randomBytes(16).toString("base64url")
+        const tokenDto: LoginTokenDto = {
+            issuedEpoch: (new Date).getTime(),
+            key: key,
+            redirectUrl: args.redirectUrl
+        }
+
+        const path = `${User.S3_LOGIN_TOKEN_PATH}/${args.userId}`
+        const success = await this.s3Writter.writeJsonFileToS3<LoginTokenDto>(tokenDto, path, {
+            allowOverwrite: true
+        })
+
+        if (!success) {
+            throw new HttpError(HttpStatusCode.SERVER_ERROR, "We were unable to create a login token.")
+        }
+
+        return key
     }
 
     async getLoginToken(userId: string): Promise<LoginTokenDto | undefined> {
         const path = `${User.S3_LOGIN_TOKEN_PATH}/${userId}`
         return this.s3Writter.readJsonFileFromS3<LoginTokenDto>(path)
+    }
+
+    async useLoginToken(userId: string) {
+        const path = `${User.S3_LOGIN_TOKEN_PATH}/${userId}`
+        return this.s3Writter.removeJsonFileFromS3(path)
     }
 }
 
@@ -82,6 +118,8 @@ type ByEmailDto = {
 
 type LoginTokenDto = {
     issuedEpoch: number
+    key: string
+    redirectUrl: string
 }
 
 type UserDto = {

@@ -1,0 +1,63 @@
+---
+import "../styles/global.css"
+import "../styles/sign-in.css"
+
+import SiteLayout from "../layouts/layout.astro"
+---
+
+<SiteLayout title="Complete sign in | Enfield NH Zoning">
+    <div id="wait">Please wait while we process your request.</div>
+    <div id="expired" style="display:none;">
+        You token is expired.  Please visit the <a href="/sign-in">sign in</a> page and try again.
+    </div>
+</SiteLayout>
+
+<script>
+    import $ from "jquery"
+
+    import { type Account } from "@enfield-zoning/website-api-dto"
+
+    import { fetchPost } from "../scripts/fetch"
+
+    const waitBlock = $("#wait")
+    const expiredBlock = $("#expired")
+
+    completeLogin()
+
+    async function completeLogin(): Promise<void> {
+        const queryParams = new URLSearchParams(window.location.search)
+
+        const userId = queryParams.get("userId")
+        const token = queryParams.get("token")
+
+        if (!userId || !token) {
+            showExpired()
+            return
+        }
+
+        const request: Account.CompleteLoginRequest = {
+            userId: userId,
+            token: token
+        }
+
+        try {
+            const response = await fetchPost<Account.CompleteLoginRequest, Account.CompleteLoginResponse>(
+                "/account/complete-login",
+                request
+            )
+
+            if (response == null) {
+                showExpired()
+            } else {
+                window.location.href = response.redirectUrl
+            }
+        } catch {
+            showExpired()
+        }
+    }
+
+    function showExpired(): void {
+        waitBlock.hide()
+        expiredBlock.show()
+    }
+</script>

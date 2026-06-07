@@ -2,6 +2,7 @@
 import "../styles/global.css"
 
 import SiteLayout from "../layouts/layout.astro"
+import SignInButton from "../components/sign-in-button.astro"
 ---
 
 <SiteLayout title="Enfield NH Zoning Poll">
@@ -25,7 +26,9 @@ import SiteLayout from "../layouts/layout.astro"
         </div>
         <div class="contents logged-out">
             <div>You must be signed in and identified to participate in polling.</div>
-            <div><a class="button-primary signin" href="/sign-in">Sign in</a></div>
+            <div>
+                <SignInButton redirectUrl="/active-poll" />
+            </div>
         </div>
     </div>
     <div id="identity-submission" style="display:none;">

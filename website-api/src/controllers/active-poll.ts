@@ -12,7 +12,7 @@ export class ActivePoll {
             let isAllowedToVote = false
             let userDto = await this.userService.getUser(args.loggedInUserId)
             if (userDto != null) {
-                isAllowedToVote = User.isUserAlllowedToVote(userDto)
+                isAllowedToVote = User.isUserAllowedToVote(userDto)
             }
 
             if (!isAllowedToVote) {

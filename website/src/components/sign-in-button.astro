@@ -1,0 +1,11 @@
+---
+interface Props {
+    redirectUrl?: string
+}
+
+const { redirectUrl } = Astro.props
+---
+
+<a class="button-primary signin" href={`/sign-in${redirectUrl ? `?r=${redirectUrl}` : ""}`}>
+    Sign In
+</a>

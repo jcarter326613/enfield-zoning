@@ -1,3 +1,5 @@
+import "../services/dotenv.js"
+
 import { MailtrapClient } from "mailtrap"
 
 import { Account as AccountDto } from "@enfield-zoning/website-api-dto"
@@ -32,24 +34,35 @@ export class Account {
         }
     }
 
-    public async create(args: ControllerParameters<AccountDto.AccountCreateModel>): Promise<Response> {
+    public async create(args: ControllerParameters<AccountDto.AccountCreateRequest>): Promise<Response> {
         // Create a user
         const result = await this.userService.createUser(args.body)
+        const response = new Response()
 
         if (result) {
             // Return an auth token with the new userid
             const response = new Response()
+            const responseDto: AccountDto.AccountCreateResponse = {
+                success: true,
+                isDuplicate: false,
+            }
             response.setGenerateAuthToken(result)
-            return response
+            response.setJson(responseDto)
         } else {
-            // Fail the creation with a "User already exists" error.
-            throw new HttpError(HttpStatusCode.DUPLICATE, "The supplied email address is already in use.")
+            const responseDto: AccountDto.AccountCreateResponse = {
+                success: false,
+                isDuplicate: true,
+            }
+            response.setJson(responseDto)
         }
+            
+        return response
     }
 
     public async startLogin(args: ControllerParameters<AccountDto.LoginRequest>): Promise<AccountDto.LoginResponse> {
         const email = args.body.email
         const userId = await this.userService.getUserIdByEmail(email)
+        const redirectUrl = args.body.redirectUrl
 
         if (userId == null) {
             return {
@@ -70,7 +83,15 @@ export class Account {
                     notFound: false,
                 }
             } else {
-                await this.sendLoginEmail(email, userId)
+                const key = await this.userService.createLoginToken({
+                    userId: userId,
+                    redirectUrl: redirectUrl ?? "/"
+                })
+                await this.sendLoginEmail({
+                    email: email, 
+                    userId: userId, 
+                    key: key
+                })
                 return {
                     emailSent: true,
                     throttled: false,
@@ -80,13 +101,41 @@ export class Account {
         }
     }
 
-    private async sendLoginEmail(email: string, userId: string) {
+    public async completeLogin(args: ControllerParameters<AccountDto.CompleteLoginRequest>): 
+        Promise<Response> 
+    {
+        const userId = args.body.userId
+        const key = args.body.token
+        const loginTokenDto = await this.userService.getLoginToken(userId)
+        const nowEpoch = (new Date()).getTime()
+        if (
+            loginTokenDto != null &&
+            loginTokenDto.issuedEpoch > nowEpoch - this.msLoginTokenTimeout &&
+            loginTokenDto.key == key
+        ) {
+            const response = new Response
+            const responseDto: AccountDto.CompleteLoginResponse = {
+                redirectUrl: loginTokenDto.redirectUrl
+            }
+            response.setGenerateAuthToken(userId)
+            response.setJson(responseDto)
+            return response
+        } else {
+            throw new HttpError(HttpStatusCode.UNAUTHORIZED, "The supplied token was not valid.")
+        }
+    }
+
+    private async sendLoginEmail(args: {
+        email: string,
+        userId: string,
+        key: string,
+    }) {
         const sender = {
             email: "noreply@enfieldnhzoning.org",
             name: "Enfield NH Zoning",
         }
         const recipients = [{
-            email: email,
+            email: args.email,
         }]
 
         await this.mailtrapClient.send({
