@@ -121,6 +121,12 @@ export class Account {
             }
             response.setGenerateAuthToken(userId)
             response.setJson(responseDto)
+
+            try {
+                await this.userService.useLoginToken(userId)
+            } catch (e: any) {
+            }
+
             return response
         } else {
             throw new HttpError(HttpStatusCode.UNAUTHORIZED, "The supplied token was not valid.")
