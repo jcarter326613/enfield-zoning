@@ -1,0 +1,6 @@
+.past-batch {
+    border-bottom: 1px solid #000;
+}
+.past-batch:last-child {
+    border-bottom: none;
+}

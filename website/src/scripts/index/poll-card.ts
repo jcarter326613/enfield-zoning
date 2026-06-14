@@ -14,6 +14,7 @@ export function createPollCard(template: JQuery<HTMLElement>, detail: Home.PollC
 
     if (link) {
         link.html(detail.title)
+        link.attr("href", `/active-poll/${detail.id}`)
     }
 
     if (summary) {

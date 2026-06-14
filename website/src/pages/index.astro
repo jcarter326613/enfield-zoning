@@ -1,15 +1,41 @@
 ---
 import "../styles/global.css"
+import "../styles/home.css"
 
 import SiteLayout from "../layouts/layout.astro"
 import PollCardTemplate from "../components/index/poll-card.astro"
 ---
 
 <SiteLayout title="Enfield NH Zoning">
-    <div class="stack" id="contents">
-        <h2>Current Polls - June Batch</h2>
+    <div class="stack">
+        <h2>Current Polls - July Batch</h2>
+        <div id="active-polls">
+            <span id="no-polls" style="display:none;">
+                We were unable to load the list of active polls.  
+                Please try again later.
+            </span>
+        </div>
         <PollCardTemplate id="template" />
     </div>
+    <!--
+    <div class="stack">
+        <h2>Past Polls</h2>
+        <div class="past-batch">
+            <h3>June Batch</h3>
+            <p>
+                <b>Poll name</b> <br />
+                Poll summary
+            </p>
+        </div>
+        <div class="past-batch">
+            <h3>May Batch</h3>
+            <p>
+                <b>Poll name</b> <br />
+                Poll summary
+            </p>
+        </div>
+    </div>
+    -->
 </SiteLayout>
 
 <script>
@@ -23,10 +49,10 @@ import PollCardTemplate from "../components/index/poll-card.astro"
 
         // Display the data
         const template = $("template")
-        const stack = $("#contents")
+        const stack = $("#active-polls")
 
         if (data == null) {
-            stack.html("")
+            $("#no-polls", stack).show()
         } else {
             for (let card of data.cards) {
                 const newCard = createPollCard(template, card)

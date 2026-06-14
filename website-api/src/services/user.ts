@@ -5,9 +5,9 @@ import { HttpStatusCode } from "../http-status-code.js"
 
 export class User {
     static readonly S3_USER_PATH = "v1/users"
-    static readonly S3_USER_BYID_PATH = "v1/users/byId"
-    static readonly S3_USER_BYEMAIL_PATH = "v1/users/byEmail"
-    static readonly S3_LOGIN_TOKEN_PATH = "v1/users/loginTokens"
+    static readonly S3_USER_BYID_PATH = `${User.S3_USER_PATH}/byId`
+    static readonly S3_USER_BYEMAIL_PATH = `${User.S3_USER_PATH}/byEmail`
+    static readonly S3_LOGIN_TOKEN_PATH = `${User.S3_USER_PATH}/loginTokens`
 
     readonly s3Writter: S3Writer = new S3Writer
 

@@ -1,8 +1,14 @@
 ---
-import "../styles/global.css"
+export async function getStaticPaths() {
+    return [
+        { params: { slug: "one-primary-building" } },
+    ]
+}
 
-import SiteLayout from "../layouts/layout.astro"
-import SignInButton from "../components/sign-in-button.astro"
+import "../../styles/global.css"
+
+import SiteLayout from "../../layouts/layout.astro"
+import SignInButton from "../../components/sign-in-button.astro"
 ---
 
 <SiteLayout title="Enfield NH Zoning Poll">
@@ -64,8 +70,8 @@ import SignInButton from "../components/sign-in-button.astro"
         Poll,
     } from "@enfield-zoning/website-api-dto"
 
-    import { fetchGet, fetchPost } from "../scripts/fetch"
-    import { markdownToHtml } from "../scripts/markdown"
+    import { fetchGet, fetchPost } from "../../scripts/fetch"
+    import { markdownToHtml } from "../../scripts/markdown"
 
     function connectButtons() {
         $("#start-submit-identity").on("click", () => {
@@ -75,7 +81,8 @@ import SignInButton from "../components/sign-in-button.astro"
     }
 
     async function loadPage() {
-        const infoModel = await fetchGet<Poll.ActivePollResponse>("active-poll")
+        const slug = location.pathname.split("/").filter(Boolean).pop()
+        const infoModel = await fetchGet<Poll.ActivePollResponse>(`active-poll/${slug}`)
         
         if (infoModel == null) {
             window.location.href = "/"

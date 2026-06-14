@@ -3,6 +3,7 @@ export type HomeModel = {
 }
 
 export type PollCard = {
+    id: string
     title: string
     summary: string
 }
