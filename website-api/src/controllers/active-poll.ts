@@ -27,7 +27,8 @@ export class ActivePoll {
         const nowEpoch = (new Date).getTime()
         const hasExpired = nowEpoch > pollData.activeUntilEpoch
         let pollObject = await this.getVotingDataForPoll({
-            poll: pollData.feedback,
+            pollId: pollId,
+            feedbackDto: pollData.feedback,
             loggedInUserId: args.loggedInUserId,
             hasExpired: hasExpired,
         })
@@ -45,12 +46,34 @@ export class ActivePoll {
         }
     }
 
-    private getMetadataPathForPoll(pollId: string): string {
-        return `${ActivePoll.S3_ACTIVE_POLL_PATH}/${pollId}`
+    public async castVote(args: ControllerParameters<Poll.CastVote>): Promise<void> {
+        const pollId = args.params["id"]
+        const selectedValue = args.body.selectedValue
+        const userId = args.loggedInUserId
+
+        if (pollId == null || userId == null) {
+            throw new HttpError(HttpStatusCode.BAD_REQUEST, "You must specify a poll id and be logged in.")
+        }
+
+        // Save the vote
+        const s3Path = this.getS3PathForVote({
+            pollId: pollId,
+            userId: userId
+        })
+        if (selectedValue == null) {
+            await this.s3WriterService.removeJsonFileFromS3(s3Path)
+        } else {
+            await this.s3WriterService.writeJsonFileToS3<CastVote>({
+                selectedValue
+            }, s3Path, {
+                allowOverwrite: true
+            })
+        }
     }
 
     private async getVotingDataForPoll(args: {
-        poll: FeedbackDto
+        pollId: string
+        feedbackDto: FeedbackDto
         loggedInUserId: string | undefined
         hasExpired: boolean
     }): Promise<Poll.Poll> {
@@ -74,12 +97,24 @@ export class ActivePoll {
                     allowedToVote: false,
                 }
             } else {
+                // Get any historically cast votes
+                const previousVoteS3Path = this.getS3PathForVote({
+                    pollId: args.pollId,
+                    userId: args.loggedInUserId,
+                })
+                const previouslyCastVote = await this.s3WriterService.readJsonFileFromS3<CastVote>(previousVoteS3Path)
+
+                // Assemble the voting options
                 pollObject = {
                     isExpired: false,
                     loggedIn: true,
                     allowedToVote: true,
-                    votingQuestion: args.poll.votingQuestion,
-                    votingOptions: args.poll.votingOptions
+                    votingQuestion: args.feedbackDto.votingQuestion,
+                    votingOptions: args.feedbackDto.votingOptions.map(x => ({
+                        label: x.label,
+                        value: x.value,
+                        selected: previouslyCastVote?.selectedValue == x.value,
+                    }))
                 }
             }
         } else {
@@ -90,6 +125,17 @@ export class ActivePoll {
         }
 
         return pollObject
+    }
+
+    private getMetadataPathForPoll(pollId: string): string {
+        return `${ActivePoll.S3_ACTIVE_POLL_PATH}/${pollId}`
+    }
+
+    private getS3PathForVote(args: {
+        pollId: string,
+        userId: string,
+    }): string {
+        return `${this.getMetadataPathForPoll(args.pollId)}/${args.userId}`
     }
 }
 
@@ -111,4 +157,8 @@ type FeedbackDto = {
         value: string
         label: string
     }[]
+}
+
+type CastVote = {
+    selectedValue: string
 }

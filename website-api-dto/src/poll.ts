@@ -6,6 +6,10 @@ export type ActivePollResponse = {
     poll: Poll
 }
 
+export type CastVote = {
+    selectedValue: string | null
+}
+
 export type Poll = {
     isExpired: true
 } | {
@@ -31,4 +35,5 @@ export type SubmitIdentityRequest = {
 export type VotingOption = {
     value: string,
     label: string,
+    selected: boolean,
 }

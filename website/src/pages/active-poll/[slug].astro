@@ -5,7 +5,7 @@ export async function getStaticPaths() {
     ]
 }
 
-import "../../styles/global.css"
+import "../../styles/active-poll.css"
 
 import SiteLayout from "../../layouts/layout.astro"
 import SignInButton from "../../components/sign-in-button.astro"
@@ -20,11 +20,12 @@ import SignInButton from "../../components/sign-in-button.astro"
         <h2>Actual Change</h2>
         <div class="contents"></div>
     </div>
-    <div id="voting-block">
+    <div id="voting-block" style="display:none;">
         <h2>Vote here</h2>
         <div class="contents logged-in">
             <div class="question"></div>
             <div class="options"></div>
+            <sub>You may change your selection as many times as you like before the poll closes.</sub>
         </div>
         <div class="contents voting-not-allowed">
             <div>In order to participate in the poll, you must tell us who you are.</div>
@@ -136,6 +137,14 @@ import SignInButton from "../../components/sign-in-button.astro"
                         .attr("id", id)
                         .attr("name", "vote")
                         .attr("value", value.value)
+                    if (value.selected) {
+                        input.attr("checked", "checked")
+                    }
+                    input.on("change", async () => {
+                        await fetchPost<Poll.CastVote, void>(`active-poll/${slug}/cast-vote`, {
+                            selectedValue: value.value
+                        })
+                    })
 
                     const label = $("<label>")
                         .attr("for", id)
