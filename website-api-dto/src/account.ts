@@ -32,3 +32,8 @@ export type LoginResponse = {
     throttled: boolean
     notFound: boolean
 }
+
+export type SubmitIdentity = {
+    legalName: string
+    legalStreet: string
+}

@@ -9,7 +9,7 @@ export class User {
     static readonly S3_USER_BYEMAIL_PATH = `${User.S3_USER_PATH}/byEmail`
     static readonly S3_LOGIN_TOKEN_PATH = `${User.S3_USER_PATH}/loginTokens`
 
-    readonly s3Writter: S3Writer = new S3Writer
+    private readonly s3Writter: S3Writer = new S3Writer
 
     // Static publics
     static isUserAllowedToVote(userDto: UserDto): boolean {
@@ -55,7 +55,7 @@ export class User {
         // If the email index was already populated
         if (emailReserveResult !== true) {
             // Fail the creation with a "User already exists" error.
-            await this.s3Writter.removeJsonFileFromS3(`${User.S3_USER_BYID_PATH}/${userId}`)
+            await this.s3Writter.removeJsonFileFromS3(this.getS3UserPath(userId))
             return false
         }
 
@@ -64,7 +64,7 @@ export class User {
     }
 
     async getUser(id: string): Promise<UserDto | undefined> {
-        const path = `${User.S3_USER_BYID_PATH}/${id}`
+        const path = this.getS3UserPath(id)
         return await this.s3Writter.readJsonFileFromS3<UserDto>(path)
     }
 
@@ -109,6 +109,37 @@ export class User {
     async useLoginToken(userId: string) {
         const path = `${User.S3_LOGIN_TOKEN_PATH}/${userId}`
         return this.s3Writter.removeJsonFileFromS3(path)
+    }
+
+    async setProvidedIdentity(args: {
+        userId: string,
+        legalName: string,
+        legalStreet: string,
+    }) {
+        const userDto = await this.getUser(args.userId)
+
+        if (userDto != null) {
+            if (args.legalName.trim().length > 0) {
+                userDto.suppliedLegalName = args.legalName
+            } else {
+                delete userDto.suppliedLegalName
+            }
+
+            if (args.legalStreet.trim().length > 0) {
+                userDto.suppliedDomicileStreet = args.legalStreet
+            } else {
+                delete userDto.suppliedDomicileStreet
+            }
+
+            const path = this.getS3UserPath(args.userId)
+            await this.s3Writter.writeJsonFileToS3(userDto, path, {
+                allowOverwrite: true
+            })
+        }
+    }
+
+    private getS3UserPath(userId: string) {
+        return `${User.S3_USER_BYID_PATH}/${userId}`
     }
 }
 

@@ -58,6 +58,7 @@ import SignInButton from "../../components/sign-in-button.astro"
                     <input id="identity-street" type="text" />
                 </label>
             </div>
+            <div id="identity-error" class="error-message" style="display:none;"></div>
             <div>
                 <button id="submit-identity">Submit</button>
             </div>
@@ -68,6 +69,7 @@ import SignInButton from "../../components/sign-in-button.astro"
 <script>
     import $ from "jquery"
     import type { 
+        Account,
         Poll,
     } from "@enfield-zoning/website-api-dto"
 
@@ -165,16 +167,28 @@ import SignInButton from "../../components/sign-in-button.astro"
         const formDiv = $("#identity-submission")
         const nameInput = $("#identity-name", formDiv)
         const streetInput = $("#identity-street", formDiv)
+        const errorDiv = $("#identity-error", formDiv)
 
-        //try {
-            await fetchPost<Poll.SubmitIdentityRequest, void>("identity", {
-                name: nameInput.text(),
-                street: streetInput.text()
-            })
-            loadPage()
-        //} catch (e: any) {
-            // Display an error
-        //}
+        const legalName = String(nameInput.val()).trim()
+        const legalStreet = String(streetInput.val()).trim()
+
+        errorDiv.hide().text("")
+
+        if (legalName.length === 0 || legalStreet.length === 0) {
+            errorDiv
+                .text("Legal name and domicile street are required.")
+                .show()
+
+            return
+        }
+
+        await fetchPost<Account.SubmitIdentity, void>("account/submit-identity", {
+            legalName,
+            legalStreet
+        })
+
+        $("#identity-submission").hide()
+        loadPage()
     }
 
     connectButtons()

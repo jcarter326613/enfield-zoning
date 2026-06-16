@@ -57,7 +57,7 @@ export class Account {
             }
             response.setJson(responseDto)
         }
-            
+        
         return response
     }
 
@@ -137,6 +137,17 @@ export class Account {
         const response = new Response
         response.setGenerateAuthToken(null)
         return response
+    }
+
+    public async submitIdentity(args: ControllerParameters<AccountDto.SubmitIdentity>): Promise<void> {
+        if (args.loggedInUserId == null) {
+            throw new HttpError(HttpStatusCode.UNAUTHORIZED, "You must be logged in to set your identity")
+        }
+
+        await this.userService.setProvidedIdentity({
+            userId: args.loggedInUserId,
+            ...args.body
+        })
     }
 
     private async sendLoginEmail(args: {
