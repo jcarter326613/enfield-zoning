@@ -14,11 +14,13 @@ export class Authentication
 {
     static readonly ACCESS_TOKEN_SECRET = "/enfieldnhzoning/website-api/access-token"
     static readonly REFRESH_TOKEN_SECRET = "/enfieldnhzoning/website-api/refresh-token"
+    static readonly ADMIN_USER_ID_PATH = "/enfieldnhzoning/website-api/admin-user-id"
     static readonly AUTHORIZATION_COOKIE_NAME = "X-ENFIELDNHZONING-AUTHORIZATION"
     static readonly REFRESH_TOKEN_PATH = "v1/refreshTokens"
     static readonly MAX_DAYS_REFRESH_TOKEN_AGE = 60
 
     private isInitialized: boolean = false
+    private adminUserId: string | null = null
 
     private accessTokenSigner: (payload: jwt.SignerPayload) => string
     private accessTokenVerifier: (token: jwt.Bufferable) => unknown
@@ -65,7 +67,8 @@ export class Authentication
 
     public async verifyAuthentication(req: express.Request): Promise<{
         newTokenNeeded: boolean,
-        userId: string
+        userId: string,
+        isAdmin: boolean,
     }> {
         // Initialize
         await this.initialize()
@@ -84,7 +87,8 @@ export class Authentication
         // Extract the token data
         const promise = new Promise<{
             newTokenNeeded: boolean,
-            userId: string
+            userId: string,
+            isAdmin: boolean,
         }>(async (resolve, reject) => {
             let authContents: any = null
             try {
@@ -99,7 +103,8 @@ export class Authentication
             if (authContentsCast?.a != null) {
                 resolve({
                     newTokenNeeded: false,
-                    userId: authContentsCast.a
+                    userId: authContentsCast.a,
+                    isAdmin: authContentsCast.a == this.adminUserId
                 })
                 return
             } else {
@@ -113,7 +118,8 @@ export class Authentication
                             if (success) {
                                 resolve({
                                     newTokenNeeded: true,
-                                    userId: userId
+                                    userId: userId,
+                                    isAdmin: userId == this.adminUserId,
                                 })
                                 return
                             }
@@ -182,13 +188,20 @@ export class Authentication
     private async initialize()
     {
         if (!this.isInitialized) {
-            const accessTokenSecret = await this.getKey("/enfieldnhzoning/website-api/access-token")
-            const refreshTokenSecret = await this.getKey("/enfieldnhzoning/website-api/refresh-token")
+            const accessTokenSecret = await this.getKey(Authentication.ACCESS_TOKEN_SECRET)
+            const refreshTokenSecret = await this.getKey(Authentication.REFRESH_TOKEN_SECRET)
+            const adminUserId = await this.getKey(Authentication.ADMIN_USER_ID_PATH)
+
             if (accessTokenSecret == null || refreshTokenSecret == null || 
                 accessTokenSecret.length == 0 || refreshTokenSecret.length == 0)
             {
                 throw new Error("Access token secret not defined")
             }
+
+            if (adminUserId.length == 0) {
+                throw new Error("Admin user id not defined")
+            }
+            this.adminUserId = adminUserId
 
             this.accessTokenSigner = jwt.createSigner({
                 key: accessTokenSecret,

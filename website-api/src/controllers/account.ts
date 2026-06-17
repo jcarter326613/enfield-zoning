@@ -32,7 +32,8 @@ export class Account {
 
     public async authstatus(args: ControllerParameters<void>): Promise<AccountDto.AuthStatus> {
         return {
-            isLoggedIn: args.loggedInUserId != null
+            isLoggedIn: args.loggedInUserId != null,
+            isAdmin: args.loggedInUserIsAdmin ?? false,
         }
     }
 

@@ -43,7 +43,8 @@ const currentPath = Astro.url.pathname
                     {(currentPath == "/sign-up") ? <></> : 
                         <a class="button-primary create" href="/sign-up">Create account</a>
                     }
-                    <button class="button-primary logout" type="button">Logout</a>
+                    <button class="button-primary logout" type="button">Logout</button>
+                    <a class="button-secondary admin" href="/admin/comments">Admin</a>
                 </nav>
             </header>
 
@@ -69,12 +70,17 @@ const currentPath = Astro.url.pathname
     const signinButton = $(".auth-actions .signin")
     const createButton = $(".auth-actions .create")
     const logoutButton = $(".auth-actions .logout")
+    const adminButton = $(".auth-actions .admin")
 
     async function updateAuthButtons() {
         const response = await fetchGet<Account.AuthStatus>("authstatus")
 
         if (response?.isLoggedIn) {
             logoutButton.css("display", "inline-flex")
+
+            if (response.isAdmin) {
+                adminButton.css("display", "inline-flex")
+            }
         } else {
             signinButton.css("display", "inline-flex")
             createButton.css("display", "inline-flex")

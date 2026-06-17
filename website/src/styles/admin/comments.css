@@ -1,0 +1,82 @@
+#admin-comment-review {
+    display: grid;
+    gap: 1rem;
+}
+
+.admin-review-poll {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--panel-strong);
+}
+
+.admin-review-poll-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: baseline;
+}
+
+.admin-review-poll-header h3 {
+    margin: 0;
+}
+
+.poll-comments {
+    display: grid;
+    gap: 1rem;
+}
+
+.admin-review-comment {
+    display: grid;
+    gap: 0.8rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fcfbf8;
+}
+
+.admin-review-comment.is-busy {
+    opacity: 0.65;
+}
+
+.comment-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--muted);
+    font-size: 0.94rem;
+}
+
+.comment-author {
+    font-weight: 700;
+    color: var(--text);
+}
+
+.comment-text {
+    white-space: pre-wrap;
+    padding-left: 1rem;
+    border-left: 4px solid var(--accent-soft);
+}
+
+.comment-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.reject-message-block {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.reject-message-block label {
+    display: grid;
+    gap: 0.4rem;
+}
+
+.reject-message {
+    width: 100%;
+    resize: vertical;
+}

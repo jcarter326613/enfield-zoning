@@ -16,7 +16,7 @@ export class ActivePoll {
         const pollId = args.params["id"]
 
         // Get the poll metadata
-        const metadataPath = this.getMetadataPathForPoll(pollId)
+        const metadataPath = ActivePoll.getMetadataPathForPoll(pollId)
         const pollData = await this.s3WriterService.readJsonFileFromS3<ActivePollDto>(metadataPath)
 
         if (pollData == null) {
@@ -56,7 +56,7 @@ export class ActivePoll {
         }
 
         // Save the vote
-        const s3Path = this.getS3PathForVote({
+        const s3Path = ActivePoll.getS3PathForVote({
             pollId: pollId,
             userId: userId
         })
@@ -83,7 +83,7 @@ export class ActivePoll {
         await this.requirePollExists(pollId)
 
         const comments = await this.s3WriterService.readJsonFolderFromS3<DiscussionCommentDto>(
-            this.getS3PathForComments(pollId)
+            ActivePoll.getS3PathForComments(pollId)
         )
 
         return {
@@ -131,7 +131,7 @@ export class ActivePoll {
                 createdAtEpoch: Date.now(),
                 passedReview: false,
             },
-            this.getS3PathForComments(pollId),
+            ActivePoll.getS3PathForComments(pollId),
             {
                 addUniqueSuffix: true
             }
@@ -173,7 +173,7 @@ export class ActivePoll {
                 }
             } else {
                 // Get any historically cast votes
-                const previousVoteS3Path = this.getS3PathForVote({
+                const previousVoteS3Path = ActivePoll.getS3PathForVote({
                     pollId: args.pollId,
                     userId: args.loggedInUserId,
                 })
@@ -203,7 +203,7 @@ export class ActivePoll {
     }
 
     private async requirePollExists(pollId: string): Promise<void> {
-        const metadataPath = this.getMetadataPathForPoll(pollId)
+        const metadataPath = ActivePoll.getMetadataPathForPoll(pollId)
         const pollData = await this.s3WriterService.readJsonFileFromS3<ActivePollDto>(metadataPath)
 
         if (pollData == null) {
@@ -211,15 +211,15 @@ export class ActivePoll {
         }
     }
 
-    private getMetadataPathForPoll(pollId: string): string {
+    public static getMetadataPathForPoll(pollId: string): string {
         return `${ActivePoll.S3_ACTIVE_POLL_PATH}/${pollId}`
     }
 
-    private getS3PathForComments(pollId: string): string {
+    public static getS3PathForComments(pollId: string): string {
         return `${this.getMetadataPathForPoll(pollId)}/comments`
     }
 
-    private getS3PathForVote(args: {
+    public static getS3PathForVote(args: {
         pollId: string,
         userId: string,
     }): string {
@@ -227,9 +227,10 @@ export class ActivePoll {
     }
 }
 
-type ActivePollDto = (
+export type ActivePollDto = {
+    activeUntilEpoch: number
+} & (
     {
-        activeUntilEpoch: number
         type: "zoning-ammendment"
         summaryMarkdown: string
         zoningText: string
@@ -251,7 +252,7 @@ type CastVote = {
     selectedValue: string
 }
 
-type DiscussionCommentDto = {
+export type DiscussionCommentDto = {
     userId: string
     text: string
     createdAtEpoch: number

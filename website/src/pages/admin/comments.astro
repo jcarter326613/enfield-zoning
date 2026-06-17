@@ -1,0 +1,257 @@
+---
+import "../../styles/admin/comments.css"
+
+import SiteLayout from "../../layouts/layout.astro"
+import SignInButton from "../../components/sign-in-button.astro"
+---
+
+<SiteLayout title="Admin Comment Review">
+    <div id="admin-comment-review">
+        <h2>Admin Comment Review</h2>
+
+        <div id="admin-review-loading">
+            Loading comments that require review...
+        </div>
+
+        <div id="admin-review-error" class="error-message" style="display:none;"></div>
+
+        <div id="admin-review-login" style="display:none;">
+            <p>You must be signed in as the administrator to review comments.</p>
+            <SignInButton redirectUrl="/admin/comments" />
+        </div>
+
+        <div id="admin-review-empty" style="display:none;">
+            No comments currently require review.
+        </div>
+
+        <div id="admin-review-polls"></div>
+
+        <template id="admin-review-poll-template">
+            <section class="admin-review-poll">
+                <div class="admin-review-poll-header">
+                    <h3 class="poll-title"></h3>
+                </div>
+                <div class="poll-comments"></div>
+            </section>
+        </template>
+
+        <template id="admin-review-comment-template">
+            <article class="admin-review-comment">
+                <div class="comment-meta">
+                    <span class="comment-date"></span>
+                </div>
+
+                <div class="comment-text"></div>
+
+                <div class="comment-actions">
+                    <button class="approve-comment button-primary" type="button">
+                        Pass review
+                    </button>
+
+                    <button class="reject-comment button-secondary" type="button">
+                        Delete
+                    </button>
+
+                    <button class="start-reject-with-message button-secondary" type="button">
+                        Delete and email user
+                    </button>
+                </div>
+
+                <div class="reject-message-block" style="display:none;">
+                    <label>
+                        Rejection message
+                        <textarea class="reject-message" rows="5"></textarea>
+                    </label>
+
+                    <p class="fine-print">
+                        The email will include the original comment and a link to the poll.
+                    </p>
+
+                    <div class="comment-actions">
+                        <button class="reject-with-message button-primary" type="button">
+                            Send email and delete
+                        </button>
+
+                        <button class="cancel-reject-with-message button-secondary" type="button">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </article>
+        </template>
+    </div>
+</SiteLayout>
+
+<script>
+    import $ from "jquery"
+
+    import { Admin } from "@enfield-zoning/website-api-dto"
+
+    import { fetchGet, fetchPost } from "../../scripts/fetch"
+
+    function setError(message: string) {
+        $("#admin-review-error").text(message).show()
+        $("#admin-review-loading").hide()
+    }
+
+    async function loadComments() {
+        const response = await fetchGet<Admin.GetCommentsResponse>("admin/comments")
+
+        $("#admin-review-loading").hide()
+
+        if (response == null) {
+            $("#admin-review-login").show()
+            return
+        }
+
+        if (response.polls.length === 0) {
+            $("#admin-review-empty").show()
+            return
+        }
+
+        const pollsDiv = $("#admin-review-polls")
+        pollsDiv.html("")
+
+        response.polls.forEach(poll => {
+            pollsDiv.append(createPollSection(poll))
+        })
+    }
+
+    function createPollSection(poll: Admin.Poll): JQuery<HTMLElement> {
+        const template = $("#admin-review-poll-template")
+
+        const node = $("<div>").append(template.contents().clone())
+
+        $(".poll-title", node).text(poll.title)
+
+        const commentsDiv = $(".poll-comments", node)
+
+        poll.comments.forEach(comment => {
+            commentsDiv.append(createCommentCard(poll.id, comment))
+        })
+
+        return node
+    }
+
+    function createCommentCard(pollId: string, comment: Admin.Comment): JQuery<HTMLElement> {
+        const template = $("#admin-review-comment-template")
+
+        const node = $("<div>").append(template.contents().clone())
+        const card = $(".admin-review-comment", node)
+
+        card.attr("data-comment-id", comment.id)
+
+        $(".comment-date", node).text(formatDate(comment.createdAtEpoch))
+        $(".comment-text", node).text(comment.text)
+
+        $(".approve-comment", node).on("click", async () => {
+            await approveComment({
+                card, 
+                pollId,
+                commentId: comment.id
+            })
+        })
+
+        $(".reject-comment", node).on("click", async () => {
+            await rejectComment(card, {
+                pollId: pollId,
+                commentId: comment.id,
+                message: undefined,
+            })
+        })
+
+        $(".start-reject-with-message", node).on("click", () => {
+            $(".reject-message-block", node).show()
+        })
+
+        $(".cancel-reject-with-message", node).on("click", () => {
+            $(".reject-message-block", node).hide()
+            $(".reject-message", node).val("")
+        })
+
+        $(".reject-with-message", node).on("click", async () => {
+            const message = String($(".reject-message", node).val()).trim()
+
+            if (message.length === 0) {
+                alert("Enter a rejection message first.")
+                return
+            }
+
+            await rejectComment(card, {
+                pollId: pollId,
+                commentId: comment.id,
+                message
+            })
+        })
+
+        return node
+    }
+
+    async function approveComment(args: {
+        card: JQuery<HTMLElement>, 
+        pollId: string,
+        commentId: string
+    }) {
+        setBusy(args.card, true)
+
+        await fetchPost<Admin.ApproveCommentRequest, void>(
+            `admin/comments/approve`,
+            {
+                pollId: args.pollId,
+                commentId: args.commentId
+            }
+        )
+
+        removeCard(args.card)
+    }
+
+    async function rejectComment(
+        card: JQuery<HTMLElement>,
+        request: Admin.RejectCommentRequest
+    ) {
+        setBusy(card, true)
+
+        await fetchPost<Admin.RejectCommentRequest, void>(
+            `admin/comments/reject`,
+            request
+        )
+
+        removeCard(card)
+    }
+
+    function setBusy(card: JQuery<HTMLElement>, busy: boolean) {
+        card.toggleClass("is-busy", busy)
+        $("button, textarea", card).prop("disabled", busy)
+    }
+
+    function removeCard(card: JQuery<HTMLElement>) {
+        const pollSection = card.closest(".admin-review-poll")
+
+        card.remove()
+
+        if ($(".admin-review-comment", pollSection).length === 0) {
+            pollSection.remove()
+        }
+
+        if ($(".admin-review-comment").length === 0) {
+            $("#admin-review-empty").show()
+        }
+    }
+
+    function formatDate(epoch: number): string {
+        const date = new Date(epoch)
+
+        if (Number.isNaN(date.getTime())) {
+            return ""
+        }
+
+        return date.toLocaleString(undefined, {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit"
+        })
+    }
+
+    loadComments()
+</script>

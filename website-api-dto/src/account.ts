@@ -11,6 +11,7 @@ export type AccountCreateResponse = {
 
 export type AuthStatus = {
     isLoggedIn: boolean
+    isAdmin: boolean
 }
 
 export type CompleteLoginRequest = {

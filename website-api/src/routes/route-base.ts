@@ -44,10 +44,12 @@ export class RouteBase<T>
     {
         // Perform the auth first
         let authId: string | undefined
+        let isAdmin: boolean | undefined
         let needNewAuthToken = false
         try {
             const authResults = await this.authentication.verifyAuthentication(request)
             authId = authResults.userId
+            isAdmin = authResults.isAdmin
             needNewAuthToken = authResults.newTokenNeeded
         } catch (e: any) {}
 
@@ -61,7 +63,8 @@ export class RouteBase<T>
                 body: request.body,
                 ips: request.ips,
                 ip: request.ip ?? "",
-                loggedInUserId: authId
+                loggedInUserId: authId,
+                loggedInUserIsAdmin: isAdmin,
             })
             response.status(successCode)
 
@@ -111,4 +114,5 @@ export type ControllerParameters<B> = {
     ips: string[],
     ip: string,
     loggedInUserId: string | undefined,
+    loggedInUserIsAdmin: boolean | undefined,
 }

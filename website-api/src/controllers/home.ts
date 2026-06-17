@@ -20,11 +20,11 @@ export class Home {
     }
 }
 
-type AllCardsDto = {
+export type AllCardsDto = {
     cards: CardDto[]
 }
 
-type CardDto = {
+export type CardDto = {
     id: string
     summary: string
     title: string
