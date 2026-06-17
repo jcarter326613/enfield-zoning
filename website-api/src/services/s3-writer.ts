@@ -1,8 +1,9 @@
 import { randomUUID } from "node:crypto"
-import { 
+import {
     DeleteObjectCommand,
     GetObjectCommand,
     HeadObjectCommand,
+    ListObjectsV2Command,
     PutObjectCommand,
     S3Client
 } from "@aws-sdk/client-s3"
@@ -115,6 +116,56 @@ export class S3Writer {
             }
             throw e
         }
+    }
+
+    public async readJsonFolderFromS3<T>(
+        folderPath: string
+    ): Promise<{ id: string, payload: T }[]> {
+        const normalizedFolderPath = folderPath.replace(/^\/+/, "").replace(/\/+$/, "")
+        const prefix = `${normalizedFolderPath}/`
+
+        const objects: { id: string, payload: T }[] = []
+        let continuationToken: string | undefined
+
+        do {
+            const listResponse = await s3.send(
+                new ListObjectsV2Command({
+                    Bucket: bucketName,
+                    Prefix: prefix,
+                    ContinuationToken: continuationToken
+                })
+            )
+
+            for (const item of listResponse.Contents ?? []) {
+                if (item.Key == null || !item.Key.endsWith(".json")) {
+                    continue
+                }
+
+                const getResponse = await s3.send(
+                    new GetObjectCommand({
+                        Bucket: bucketName,
+                        Key: item.Key
+                    })
+                )
+
+                if (getResponse.Body == null) {
+                    continue
+                }
+
+                const contents = await getResponse.Body.transformToString()
+                const fileName = item.Key.substring(prefix.length)
+                const id = fileName.replace(/\.json$/, "")
+
+                objects.push({
+                    id,
+                    payload: JSON.parse(contents) as T
+                })
+            }
+
+            continuationToken = listResponse.NextContinuationToken
+        } while (continuationToken != null)
+
+        return objects
     }
 
     public async removeJsonFileFromS3<T>(

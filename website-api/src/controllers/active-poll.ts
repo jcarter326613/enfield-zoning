@@ -71,6 +71,78 @@ export class ActivePoll {
         }
     }
 
+    public async getDiscussionComments(
+        args: ControllerParameters<void>
+    ): Promise<Poll.GetDiscussionCommentsResponse> {
+        const pollId = args.params["id"]
+
+        if (pollId == null) {
+            throw new HttpError(HttpStatusCode.BAD_REQUEST, "You must specify a poll id.")
+        }
+
+        await this.requirePollExists(pollId)
+
+        const comments = await this.s3WriterService.readJsonFolderFromS3<DiscussionCommentDto>(
+            this.getS3PathForComments(pollId)
+        )
+
+        return {
+            loggedIn: args.loggedInUserId != null,
+            comments: comments
+                .map(comment => ({
+                    id: comment.id,
+                    text: comment.payload.text,
+                    createdAtEpoch: comment.payload.createdAtEpoch
+                }))
+                .sort((a, b) => a.createdAtEpoch - b.createdAtEpoch)
+        }
+    }
+
+    public async createDiscussionComment(
+        args: ControllerParameters<Poll.CreateDiscussionCommentRequest>
+    ): Promise<Poll.CreateDiscussionCommentResponse> {
+        const pollId = args.params["id"]
+        const userId = args.loggedInUserId
+        const text = args.body.text?.trim()
+
+        if (pollId == null) {
+            throw new HttpError(HttpStatusCode.BAD_REQUEST, "You must specify a poll id.")
+        }
+
+        if (userId == null) {
+            throw new HttpError(HttpStatusCode.UNAUTHORIZED, "You must be logged in to post a comment.")
+        }
+
+        if (text == null || text.length === 0) {
+            throw new HttpError(HttpStatusCode.BAD_REQUEST, "Comment text is required.")
+        }
+
+        if (text.length > 5000) {
+            throw new HttpError(HttpStatusCode.BAD_REQUEST, "Comment text is too long.")
+        }
+
+        await this.requirePollExists(pollId)
+
+        const commentId = await this.s3WriterService.writeJsonFileToS3<DiscussionCommentDto>(
+            {
+                text,
+                createdAtEpoch: Date.now()
+            },
+            this.getS3PathForComments(pollId),
+            {
+                addUniqueSuffix: true
+            }
+        )
+
+        if (commentId == null) {
+            throw new HttpError(HttpStatusCode.SERVER_ERROR, "The comment could not be saved.")
+        }
+
+        return {
+            success: true
+        }
+    }
+
     private async getVotingDataForPoll(args: {
         pollId: string
         feedbackDto: FeedbackDto
@@ -127,15 +199,28 @@ export class ActivePoll {
         return pollObject
     }
 
+    private async requirePollExists(pollId: string): Promise<void> {
+        const metadataPath = this.getMetadataPathForPoll(pollId)
+        const pollData = await this.s3WriterService.readJsonFileFromS3<ActivePollDto>(metadataPath)
+
+        if (pollData == null) {
+            throw new HttpError(HttpStatusCode.NOT_FOUND, "The specified poll could not be found.")
+        }
+    }
+
     private getMetadataPathForPoll(pollId: string): string {
         return `${ActivePoll.S3_ACTIVE_POLL_PATH}/${pollId}`
+    }
+
+    private getS3PathForComments(pollId: string): string {
+        return `${this.getMetadataPathForPoll(pollId)}/comments`
     }
 
     private getS3PathForVote(args: {
         pollId: string,
         userId: string,
     }): string {
-        return `${this.getMetadataPathForPoll(args.pollId)}/${args.userId}`
+        return `${this.getMetadataPathForPoll(args.pollId)}/votes/${args.userId}`
     }
 }
 
@@ -161,4 +246,9 @@ type FeedbackDto = {
 
 type CastVote = {
     selectedValue: string
+}
+
+type DiscussionCommentDto = {
+    text: string
+    createdAtEpoch: number
 }

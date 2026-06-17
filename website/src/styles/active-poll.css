@@ -1,3 +1,62 @@
 .options label {
     display: block;
 }
+
+/* Discussion syling */
+.options label {
+    display: block;
+}
+
+.discussion-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+}
+
+#discussion-post-block {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+#discussion-comment-text {
+    width: 100%;
+    resize: vertical;
+    font: inherit;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--panel-strong);
+    color: var(--text);
+}
+
+#discussion-comments {
+    display: grid;
+    gap: 1rem;
+}
+
+.discussion-comment {
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--panel-strong);
+}
+
+.discussion-comment-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.discussion-comment-body {
+    margin-top: 0.6rem;
+    white-space: pre-wrap;
+}
+
+#jump-to-discussion-bottom,
+#submit-discussion-comment {
+    cursor: pointer;
+}

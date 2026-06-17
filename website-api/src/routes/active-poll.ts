@@ -18,5 +18,11 @@ export class ActivePoll extends RouteBase<ActivePollController>
     {
         this.setupGet<void>("/active-poll/:id", this.controller.index)
         this.setupPost<Poll.CastVote>("/active-poll/:id/cast-vote", this.controller.castVote, HttpStatusCode.ACCEPTED)
+        this.setupGet<void>("/active-poll/:id/discussion", this.controller.getDiscussionComments)
+        this.setupPost<Poll.CreateDiscussionCommentRequest>(
+            "/active-poll/:id/discussion",
+            this.controller.createDiscussionComment,
+            HttpStatusCode.CREATED
+        )
     }
 }

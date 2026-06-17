@@ -32,3 +32,23 @@ export type VotingOption = {
     label: string,
     selected: boolean,
 }
+
+// Discussion
+export type DiscussionComment = {
+    id: string
+    text: string
+    createdAtEpoch: number
+}
+
+export type GetDiscussionCommentsResponse = {
+    loggedIn: boolean
+    comments: DiscussionComment[]
+}
+
+export type CreateDiscussionCommentRequest = {
+    text: string
+}
+
+export type CreateDiscussionCommentResponse = {
+    success: boolean
+}

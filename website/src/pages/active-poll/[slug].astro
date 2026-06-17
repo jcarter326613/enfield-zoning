@@ -64,6 +64,28 @@ import SignInButton from "../../components/sign-in-button.astro"
             </div>
         </div>
     </div>
+
+    <div id="discussion-section">
+        <div class="discussion-header">
+            <h2>Discussion</h2>
+            <button id="jump-to-discussion-bottom" type="button">Jump to bottom</button>
+        </div>
+
+        <div id="discussion-comments"></div>
+
+        <div id="discussion-post-block" style="display:none;">
+            <textarea id="discussion-comment-text" rows="5" maxlength="5000" placeholder="Add a comment"></textarea>
+            <div id="discussion-error" class="error-message" style="display:none;"></div>
+            <button id="submit-discussion-comment" type="button">Post comment</button>
+        </div>
+
+        <div id="discussion-login-block" style="display:none;">
+            <p>You must be signed in to post a comment.</p>
+            <SignInButton redirectUrl={Astro.url.pathname} />
+        </div>
+
+        <div id="discussion-bottom"></div>
+    </div>
 </SiteLayout>
 
 <script>
@@ -80,13 +102,20 @@ import SignInButton from "../../components/sign-in-button.astro"
         $("#start-submit-identity").on("click", () => {
             $("#identity-submission").show()
         })
+
         $("#submit-identity").on("click", submitIdentity)
+        $("#jump-to-discussion-bottom").on("click", scrollDiscussionToBottom)
+        $("#submit-discussion-comment").on("click", submitDiscussionComment)
     }
 
     async function loadPage() {
         const slug = location.pathname.split("/").filter(Boolean).pop()
+        if (slug == null) {
+            window.location.href = "/"
+            return
+        }
+
         const infoModel = await fetchGet<Poll.ActivePollResponse>(`active-poll/${slug}`)
-        
         if (infoModel == null) {
             window.location.href = "/"
             return
@@ -161,6 +190,9 @@ import SignInButton from "../../components/sign-in-button.astro"
                 votingAnswersDiv.html(markdownToHtml(infoModel.poll.votingQuestion))
             }
         }
+
+        // Load the discussion
+        await loadDiscussion(slug)
     }
 
     async function submitIdentity() {
@@ -189,6 +221,109 @@ import SignInButton from "../../components/sign-in-button.astro"
 
         $("#identity-submission").hide()
         loadPage()
+    }
+
+    async function loadDiscussion(slug: string) {
+        const response = await fetchGet<Poll.GetDiscussionCommentsResponse>(`active-poll/${slug}/discussion`)
+
+        const postBlock = $("#discussion-post-block")
+        const loginBlock = $("#discussion-login-block")
+        const commentsDiv = $("#discussion-comments")
+
+        postBlock.hide()
+        loginBlock.hide()
+        commentsDiv.html("")
+
+        if (response == null) {
+            commentsDiv.text("Discussion is not available right now.")
+            return
+        }
+
+        if (response.loggedIn) {
+            postBlock.show()
+        } else {
+            loginBlock.show()
+        }
+
+        response.comments
+            .sort((a, b) => a.createdAtEpoch - b.createdAtEpoch)
+            .forEach(comment => {
+                commentsDiv.append(createDiscussionComment(comment))
+            })
+    }
+
+    function createDiscussionComment(comment: Poll.DiscussionComment): JQuery<HTMLElement> {
+        const article = $("<article>").addClass("discussion-comment")
+
+        const header = $("<div>").addClass("discussion-comment-header")
+
+        const createdAt = $("<time>")
+            .attr("datetime", new Date(comment.createdAtEpoch).toISOString())
+            .text(formatDiscussionDate(comment.createdAtEpoch))
+
+        const body = $("<div>")
+            .addClass("discussion-comment-body")
+            .text(comment.text)
+
+        header.append(createdAt)
+        article.append(header).append(body)
+
+        return article
+    }
+
+    function formatDiscussionDate(epoch: number): string {
+        const date = new Date(epoch)
+
+        if (Number.isNaN(date.getTime())) {
+            return ""
+        }
+
+        return date.toLocaleString(undefined, {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit"
+        })
+    }
+
+    async function submitDiscussionComment() {
+        const slug = location.pathname.split("/").filter(Boolean).pop()
+
+        if (slug == null) {
+            return
+        }
+
+        const textInput = $("#discussion-comment-text")
+        const errorDiv = $("#discussion-error")
+        const text = String(textInput.val()).trim()
+
+        errorDiv.hide().text("")
+
+        if (text.length === 0) {
+            errorDiv.text("Comment text is required.").show()
+            return
+        }
+
+        const created = await fetchPost<Poll.CreateDiscussionCommentRequest, Poll.CreateDiscussionCommentResponse>(
+            `active-poll/${slug}/discussion`,
+            { text }
+        )
+
+        if (created?.success !== true) {
+            errorDiv.text("The comment could not be posted.  Please save the comment on your computer and try posting again later.").show()
+            return
+        }
+
+        textInput.val("")
+        await loadDiscussion(slug)
+        scrollDiscussionToBottom()
+    }
+
+    function scrollDiscussionToBottom() {
+        document.getElementById("discussion-bottom")?.scrollIntoView({
+            behavior: "smooth",
+            block: "end"
+        })
     }
 
     connectButtons()
