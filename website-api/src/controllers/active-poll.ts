@@ -89,6 +89,7 @@ export class ActivePoll {
         return {
             loggedIn: args.loggedInUserId != null,
             comments: comments
+                .filter(x => x.payload.passedReview)
                 .map(comment => ({
                     id: comment.id,
                     text: comment.payload.text,
@@ -125,8 +126,10 @@ export class ActivePoll {
 
         const commentId = await this.s3WriterService.writeJsonFileToS3<DiscussionCommentDto>(
             {
+                userId,
                 text,
-                createdAtEpoch: Date.now()
+                createdAtEpoch: Date.now(),
+                passedReview: false,
             },
             this.getS3PathForComments(pollId),
             {
@@ -249,6 +252,8 @@ type CastVote = {
 }
 
 type DiscussionCommentDto = {
+    userId: string
     text: string
     createdAtEpoch: number
+    passedReview: boolean
 }

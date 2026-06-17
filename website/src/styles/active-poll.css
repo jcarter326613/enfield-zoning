@@ -60,3 +60,19 @@
 #submit-discussion-comment {
     cursor: pointer;
 }
+
+.discussion-alert {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--accent);
+    border-radius: 12px;
+    background: var(--accent-soft);
+    color: var(--text);
+    box-shadow: var(--shadow);
+}
+
+.discussion-alert strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}

@@ -21,7 +21,7 @@ import SignInButton from "../../components/sign-in-button.astro"
         <div class="contents"></div>
     </div>
     <div id="voting-block" style="display:none;">
-        <h2>Vote here</h2>
+        <h2>Indicate Your Preference</h2>
         <div class="contents logged-in">
             <div class="question"></div>
             <div class="options"></div>
@@ -77,6 +77,11 @@ import SignInButton from "../../components/sign-in-button.astro"
             <textarea id="discussion-comment-text" rows="5" maxlength="5000" placeholder="Add a comment"></textarea>
             <div id="discussion-error" class="error-message" style="display:none;"></div>
             <button id="submit-discussion-comment" type="button">Post comment</button>
+        </div>
+
+        <div id="discussion-review-alert" class="discussion-alert" style="display:none;" role="status">
+            <strong>Comment submitted.</strong>
+            <div>Your comment is being reviewed and will appear after approval.</div>
         </div>
 
         <div id="discussion-login-block" style="display:none;">
@@ -229,9 +234,11 @@ import SignInButton from "../../components/sign-in-button.astro"
         const postBlock = $("#discussion-post-block")
         const loginBlock = $("#discussion-login-block")
         const commentsDiv = $("#discussion-comments")
+        const reviewAlert = $("#discussion-review-alert")
 
         postBlock.hide()
         loginBlock.hide()
+        reviewAlert.hide()
         commentsDiv.html("")
 
         if (response == null) {
@@ -315,8 +322,8 @@ import SignInButton from "../../components/sign-in-button.astro"
         }
 
         textInput.val("")
-        await loadDiscussion(slug)
-        scrollDiscussionToBottom()
+        $("#discussion-post-block").hide()
+        $("#discussion-review-alert").show()
     }
 
     function scrollDiscussionToBottom() {
