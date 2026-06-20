@@ -68,5 +68,8 @@ jobs:
 
           echo "IMAGE_URI=$IMAGE_URI" >> "$GITHUB_ENV"
 
-      - name: Print image URI
-        run: echo "$IMAGE_URI"
+      - name: Deploy API
+        run: |
+          cd aws-deployment
+          npm ci
+          npx cdk deploy --require-approval never -c imageTag="$IMAGE_TAG"
