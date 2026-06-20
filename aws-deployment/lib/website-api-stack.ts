@@ -1,6 +1,7 @@
 import * as cdk from "aws-cdk-lib"
 import * as ecr from "aws-cdk-lib/aws-ecr"
 import * as lambda from "aws-cdk-lib/aws-lambda"
+import * as iam from "aws-cdk-lib/aws-iam"
 import { Construct } from "constructs"
 
 export class WebsiteApiStack extends cdk.Stack {
@@ -19,6 +20,12 @@ export class WebsiteApiStack extends cdk.Stack {
             "enfieldnhzoning/website-api"
         )
 
+        const lambdaRole = iam.Role.fromRoleName(
+            this,
+            "WebsiteApiLambdaRole",
+            "enfieldzoning-api"
+        )
+
         const websiteApiLambda = new lambda.DockerImageFunction(this, "WebsiteApiLambda", {
             functionName: "enfieldnhzoning-website-api",
             code: lambda.DockerImageCode.fromEcr(repository, {
@@ -26,7 +33,8 @@ export class WebsiteApiStack extends cdk.Stack {
             }),
             architecture: lambda.Architecture.ARM_64,
             memorySize: 512,
-            timeout: cdk.Duration.seconds(30)
+            timeout: cdk.Duration.seconds(30),
+            role: lambdaRole,
         })
 
         const functionUrl = websiteApiLambda.addFunctionUrl({
