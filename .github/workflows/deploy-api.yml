@@ -69,6 +69,8 @@ jobs:
           echo "IMAGE_URI=$IMAGE_URI" >> "$GITHUB_ENV"
 
       - name: Deploy API
+        env:
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           cd aws-deployment
           npm ci
