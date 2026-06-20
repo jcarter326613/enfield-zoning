@@ -1,6 +1,10 @@
-FROM --platform=arm64 node:latest
+FROM public.ecr.aws/docker/library/node:22-bookworm-slim
 
-COPY dist/ /app
-COPY node_modules/ /app/node_modules
+ENV NODE_ENV=production
+WORKDIR /app
 
-ENTRYPOINT ["node", "app/lambda-main.js"]
+COPY package.json package-lock.json ./
+COPY node_modules ./node_modules
+COPY dist ./dist
+
+ENTRYPOINT ["node", "/app/dist/lambda-main.js"]

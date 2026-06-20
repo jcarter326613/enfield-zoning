@@ -1,0 +1,65 @@
+name: Prepare Website API
+description: Build website-api and prepare Docker build context
+
+inputs:
+  build-dir:
+    description: Prepared Docker build context directory
+    required: false
+    default: .build/website-api
+
+outputs:
+  build-dir:
+    description: Prepared Docker build context directory
+    value: ${{ inputs.build-dir }}
+
+runs:
+  using: composite
+  steps:
+    - name: Build website-api-dto
+      shell: bash
+      run: npm run build --workspace @enfield-zoning/website-api-dto
+
+    - name: Build website-api
+      shell: bash
+      run: npm run build --workspace @enfield-zoning/website-api
+
+    - name: Prepare Docker build context
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        BUILD_DIR="${{ inputs.build-dir }}"
+
+        rm -rf "$BUILD_DIR"
+        mkdir -p "$BUILD_DIR"
+
+        cp website-api/package.json "$BUILD_DIR/package.json"
+        cp package-lock.json "$BUILD_DIR/package-lock.json"
+        cp -R website-api/dist "$BUILD_DIR/dist"
+
+        npm pack \
+          --workspace @enfield-zoning/website-api-dto \
+          --pack-destination "$BUILD_DIR"
+
+        DTO_PACKAGE_FILE="$(find "$BUILD_DIR" -maxdepth 1 -name 'enfield-zoning-website-api-dto-*.tgz' -print -quit)"
+        DTO_PACKAGE_BASENAME="$(basename "$DTO_PACKAGE_FILE")"
+
+        node <<EOF
+        const fs = require("fs")
+
+        const packagePath = "$BUILD_DIR/package.json"
+        const packageJson = JSON.parse(fs.readFileSync(packagePath, "utf8"))
+
+        delete packageJson.scripts
+        delete packageJson.devDependencies
+
+        packageJson.dependencies = {
+            ...packageJson.dependencies,
+            "@enfield-zoning/website-api-dto": "file:./$DTO_PACKAGE_BASENAME"
+        }
+
+        fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 4) + "\n")
+        EOF
+
+        cd "$BUILD_DIR"
+        npm install --omit=dev
