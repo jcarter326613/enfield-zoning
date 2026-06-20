@@ -6,6 +6,7 @@ on:
     branches:
       - main
     paths:
+      - aws-deployment/**
       - website-api/**
       - website-api-dto/**
       - .github/workflows/deploy-api.yml
