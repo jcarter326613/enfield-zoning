@@ -82,8 +82,9 @@ import SignInButton from "../../components/sign-in-button.astro"
 
 <script>
     import $ from "jquery"
+    type JQueryElement = ReturnType<typeof $>
 
-    import { Admin } from "@enfield-zoning/website-api-dto"
+    import type { Admin } from "@enfield-zoning/website-api-dto"
 
     import { fetchGet, fetchPost } from "../../scripts/fetch"
 
@@ -110,7 +111,7 @@ import SignInButton from "../../components/sign-in-button.astro"
         })
     }
 
-    function createPollSection(poll: Admin.Poll): JQuery<HTMLElement> {
+    function createPollSection(poll: Admin.Poll): JQueryElement {
         const template = $("#admin-review-poll-template")
 
         const node = $("<div>").append(template.contents().clone())
@@ -126,7 +127,7 @@ import SignInButton from "../../components/sign-in-button.astro"
         return node
     }
 
-    function createCommentCard(pollId: string, comment: Admin.Comment): JQuery<HTMLElement> {
+    function createCommentCard(pollId: string, comment: Admin.Comment): JQueryElement {
         const template = $("#admin-review-comment-template")
 
         const node = $("<div>").append(template.contents().clone())
@@ -181,7 +182,7 @@ import SignInButton from "../../components/sign-in-button.astro"
     }
 
     async function approveComment(args: {
-        card: JQuery<HTMLElement>, 
+        card: JQueryElement, 
         pollId: string,
         commentId: string
     }) {
@@ -199,7 +200,7 @@ import SignInButton from "../../components/sign-in-button.astro"
     }
 
     async function rejectComment(
-        card: JQuery<HTMLElement>,
+        card: JQueryElement,
         request: Admin.RejectCommentRequest
     ) {
         setBusy(card, true)
@@ -212,12 +213,12 @@ import SignInButton from "../../components/sign-in-button.astro"
         removeCard(card)
     }
 
-    function setBusy(card: JQuery<HTMLElement>, busy: boolean) {
+    function setBusy(card: JQueryElement, busy: boolean) {
         card.toggleClass("is-busy", busy)
         $("button, textarea", card).prop("disabled", busy)
     }
 
-    function removeCard(card: JQuery<HTMLElement>) {
+    function removeCard(card: JQueryElement) {
         const pollSection = card.closest(".admin-review-poll")
 
         card.remove()

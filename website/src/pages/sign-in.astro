@@ -13,48 +13,47 @@ import SiteLayout from "../layouts/layout.astro"
                 To sign in, enter the email address of an existing account below.
             </p>
         </section>
-            <form class="signin-form">
-                <section class="signin-panel">
-                    <label>
-                        Email
-                        <input
-                            id="email-input"
-                            name="email"
-                            type="email"
-                            autocomplete="email"
-                            required
-                        />
+        <form class="signin-form">
+            <section class="signin-panel">
+                <label>
+                    Email
+                    <input
+                        id="email-input"
+                        name="email"
+                        type="email"
+                        autocomplete="email"
+                        required
+                    />
 
-                        <div id="email-error" class="field-error" style="display:none;">
-                            Enter a valid email address.
-                        </div>
-                        <div id="email-missing-error" class="field-error" style="display:none;">
-                            That email is not associated with an active account. 
-                            Please enter the correct email, or <a href="/sign-up">sign up</a> if you have not
-                            already done so.
-                        </div>
-                        <div id="email-throttled-error" class="field-error" style="display:none;">
-                            You have already requested a login email be sent.  Please check your email and click
-                            the link we sent to complete the login process.
-                        </div>
-                        <div id="email-unknown-error" class="field-error" style="display:none;">
-                            There was an error logging you in.  Please try again later.
-                        </div>
-                    </label>
-                </section>
+                    <div id="email-error" class="field-error" style="display:none;">
+                        Enter a valid email address.
+                    </div>
+                    <div id="email-missing-error" class="field-error" style="display:none;">
+                        That email is not associated with an active account. 
+                        Please enter the correct email, or <a href="/sign-up">sign up</a> if you have not
+                        already done so.
+                    </div>
+                    <div id="email-throttled-error" class="field-error" style="display:none;">
+                        You have already requested a login email be sent.  Please check your email and click
+                        the link we sent to complete the login process.
+                    </div>
+                    <div id="email-unknown-error" class="field-error" style="display:none;">
+                        There was an error logging you in.  Please try again later.
+                    </div>
+                </label>
+            </section>
 
-                <section class="login-submit-panel">
-                    <p>
-                        After submitting, we’ll send you a sign-in link by email.
-                        Click that link to finish signing in.
-                    </p>
+            <section class="login-submit-panel">
+                <p>
+                    After submitting, we’ll send you a sign-in link by email.
+                    Click that link to finish signing in.
+                </p>
 
-                    <button class="button button-primary" type="submit">
-                        Sign in
-                    </button>
-                </section>
-            </form>
-        </section>
+                <button class="button button-primary" type="submit">
+                    Sign in
+                </button>
+            </section>
+        </form>
     </main>
 </SiteLayout>
 
