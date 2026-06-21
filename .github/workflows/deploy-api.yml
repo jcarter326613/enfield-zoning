@@ -65,7 +65,7 @@ jobs:
           IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
           docker build \
-            --platform linux/arm64
+            --platform linux/arm64 \
             -f website-api/Dockerfile \
             -t "$IMAGE_URI" \
             "${{ steps.prepare-api.outputs.build-dir }}"
