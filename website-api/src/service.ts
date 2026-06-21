@@ -28,7 +28,7 @@ export class Service {
             next(); 
         });
         
-        const crossOrigin = process.env.CROSS_ORIGIN_SOURCE ?? "http://localhost:4321"
+        const crossOrigin = process.env.DOMAIN ?? "http://localhost:4321"
         console.debug(`Using CORS targets ${crossOrigin}`)
         const corsTargets = crossOrigin.split(",")
 
