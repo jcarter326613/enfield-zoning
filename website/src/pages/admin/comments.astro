@@ -82,7 +82,6 @@ import SignInButton from "../../components/sign-in-button.astro"
 
 <script>
     import $ from "jquery"
-    type JQueryElement = ReturnType<typeof $>
 
     import type { Admin } from "@enfield-zoning/website-api-dto"
 
@@ -111,7 +110,7 @@ import SignInButton from "../../components/sign-in-button.astro"
         })
     }
 
-    function createPollSection(poll: Admin.Poll): JQueryElement {
+    function createPollSection(poll: Admin.Poll): JQuery<HTMLElement> {
         const template = $("#admin-review-poll-template")
 
         const node = $("<div>").append(template.contents().clone())
@@ -127,7 +126,7 @@ import SignInButton from "../../components/sign-in-button.astro"
         return node
     }
 
-    function createCommentCard(pollId: string, comment: Admin.Comment): JQueryElement {
+    function createCommentCard(pollId: string, comment: Admin.Comment): JQuery<HTMLElement> {
         const template = $("#admin-review-comment-template")
 
         const node = $("<div>").append(template.contents().clone())
@@ -182,7 +181,7 @@ import SignInButton from "../../components/sign-in-button.astro"
     }
 
     async function approveComment(args: {
-        card: JQueryElement, 
+        card: JQuery<HTMLElement>, 
         pollId: string,
         commentId: string
     }) {
@@ -200,7 +199,7 @@ import SignInButton from "../../components/sign-in-button.astro"
     }
 
     async function rejectComment(
-        card: JQueryElement,
+        card: JQuery<HTMLElement>,
         request: Admin.RejectCommentRequest
     ) {
         setBusy(card, true)
@@ -213,12 +212,12 @@ import SignInButton from "../../components/sign-in-button.astro"
         removeCard(card)
     }
 
-    function setBusy(card: JQueryElement, busy: boolean) {
+    function setBusy(card: JQuery<HTMLElement>, busy: boolean) {
         card.toggleClass("is-busy", busy)
         $("button, textarea", card).prop("disabled", busy)
     }
 
-    function removeCard(card: JQueryElement) {
+    function removeCard(card: JQuery<HTMLElement>) {
         const pollSection = card.closest(".admin-review-poll")
 
         card.remove()
