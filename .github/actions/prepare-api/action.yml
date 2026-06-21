@@ -37,6 +37,11 @@ runs:
         cp package-lock.json "$BUILD_DIR/package-lock.json"
         cp -R website-api/dist "$BUILD_DIR/dist"
 
+        cat > "$BUILD_DIR/.env" <<EOF
+        DOMAIN=${DOMAIN}
+        MAILTRAP_TOKEN=${MAILTRAP_TOKEN}
+        EOF
+
         npm pack \
           --workspace @enfield-zoning/website-api-dto \
           --pack-destination "$BUILD_DIR"

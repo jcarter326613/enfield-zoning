@@ -58,6 +58,13 @@ export class WebsiteApiStack extends cdk.Stack {
             functionUrlAuthType: lambda.FunctionUrlAuthType.NONE
         })
 
+        websiteApiLambda.addPermission("AllowInvoke", {
+            principal: new iam.AnyPrincipal(),
+            action: "lambda:InvokeFunction",
+            invokedViaFunctionUrl: true,
+        })
+        
+
         new cdk.CfnOutput(this, "WebsiteApiFunctionUrl", {
             value: functionUrl.url
         })
