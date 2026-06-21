@@ -1,8 +1,6 @@
 import cookieParser from "cookie-parser"
-import cors from "cors"
 import express, { Express } from "express"
 import expressWinston from "express-winston"
-import http from "http"
 import winston from "winston"
 
 import { RouteBase } from "./routes/route-base.js"
@@ -30,17 +28,24 @@ export class Service {
         
         const crossOrigin = process.env.DOMAIN ?? "http://localhost:4321"
         console.debug(`Using CORS targets ${crossOrigin}`)
-        const corsTargets = crossOrigin.split(",")
+        const corsTargets = crossOrigin
+            .split(",")
+            .map(x => x.trim().toLowerCase())
+            .filter(x => x.length > 0)
 
         const allowedMethodsString = this.allowedMethods.filter(x => x != "OPTIONS").join(",")
         this.app.use((req, res, next) => {
             const providedOrigin = req.headers.origin ?? ""
             const origin = corsTargets.includes(providedOrigin.toLowerCase()) ? providedOrigin : corsTargets[0]
             res.header("Access-Control-Allow-Origin", origin)
-            res.header("Access-Control-Allow-Headers", "Content-Type")
+            res.header("Access-Control-Allow-Headers", "Content-Type, X-ENFIELDNHZONING-AUTHORIZATION")
             res.header("Access-Control-Allow-Methods", allowedMethodsString)
             res.header("Access-Control-Allow-Credentials", "true")
             return next()
+        })
+
+        this.app.options("*", (req, res) => {
+            res.sendStatus(204)
         })
 
         this.app.use(express.json())

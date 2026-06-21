@@ -39,6 +39,7 @@ export class WebsiteApiStack extends cdk.Stack {
 
         const functionUrl = websiteApiLambda.addFunctionUrl({
             authType: lambda.FunctionUrlAuthType.NONE,
+            /*
             cors: {
                 allowedOrigins: [
                   "https://beta.enfieldnhzoning.org", 
@@ -49,7 +50,7 @@ export class WebsiteApiStack extends cdk.Stack {
                   "content-type", 
                   "X-ENFIELDNHZONING-AUTHORIZATION"
                 ]
-            }
+            }*/
         })
 
         websiteApiLambda.addPermission("AllowPublicFunctionUrlInvoke", {
