@@ -13,8 +13,6 @@ import SignInButton from "../../components/sign-in-button.astro"
             Loading comments that require review...
         </div>
 
-        <div id="admin-review-error" class="error-message" style="display:none;"></div>
-
         <div id="admin-review-login" style="display:none;">
             <p>You must be signed in as the administrator to review comments.</p>
             <SignInButton redirectUrl="/admin/comments" />
@@ -88,11 +86,6 @@ import SignInButton from "../../components/sign-in-button.astro"
     import { Admin } from "@enfield-zoning/website-api-dto"
 
     import { fetchGet, fetchPost } from "../../scripts/fetch"
-
-    function setError(message: string) {
-        $("#admin-review-error").text(message).show()
-        $("#admin-review-loading").hide()
-    }
 
     async function loadComments() {
         const response = await fetchGet<Admin.GetCommentsResponse>("admin/comments")
