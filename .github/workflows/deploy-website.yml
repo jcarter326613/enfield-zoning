@@ -17,7 +17,8 @@ permissions:
 env:
   AWS_REGION: us-east-1
   WEBSITE_BUCKET_NAME: beta.enfieldnhzoning.org
-  CLOUDFRONT_DISTRIBUTION_ID: your-distribution-id-here
+  CLOUDFRONT_DISTRIBUTION_ID: E1EDHDSGB5463B
+  PUBLIC_API_BASE_URL: https://4j2sx26ytuhcdvxxmbvuvls75m0eoiub.lambda-url.us-east-1.on.aws/
 
 jobs:
   deploy-website:
@@ -40,6 +41,8 @@ jobs:
         run: npm run build --workspace @enfield-zoning/website-api-dto
 
       - name: Build website
+        env:
+          PUBLIC_API_BASE_URL: ${{ env.PUBLIC_API_BASE_URL }}
         run: npm run build --workspace @enfield-zoning/website
 
       - name: Configure AWS credentials

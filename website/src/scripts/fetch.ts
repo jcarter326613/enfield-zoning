@@ -1,4 +1,7 @@
-const TRAFFIC_URL = "http://localhost:8080/"
+const TRAFFIC_URL = (
+    import.meta.env.PUBLIC_API_BASE_URL ??
+    "http://localhost:8080/"
+).replace(/\/?$/, "/")
 
 export async function fetchGet<T>(url: string): Promise<T | null> {
     const response = await fetch(`${TRAFFIC_URL}${url}/`, {
