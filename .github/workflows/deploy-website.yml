@@ -18,7 +18,7 @@ env:
   AWS_REGION: us-east-1
   WEBSITE_BUCKET_NAME: beta.enfieldnhzoning.org
   CLOUDFRONT_DISTRIBUTION_ID: E1EDHDSGB5463B
-  PUBLIC_API_BASE_URL: https://4j2sx26ytuhcdvxxmbvuvls75m0eoiub.lambda-url.us-east-1.on.aws/
+  PUBLIC_API_BASE_URL: https://api-beta.enfieldnhzoning.org/
 
 jobs:
   deploy-website:
