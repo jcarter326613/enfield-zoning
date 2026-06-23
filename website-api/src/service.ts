@@ -38,7 +38,7 @@ export class Service {
             const providedOrigin = req.headers.origin ?? ""
             const origin = corsTargets.includes(providedOrigin.toLowerCase()) ? providedOrigin : corsTargets[0]
             res.header("Access-Control-Allow-Origin", origin)
-            res.header("Access-Control-Allow-Headers", "Content-Type, X-ENFIELDNHZONING-AUTHORIZATION")
+            res.header("Access-Control-Allow-Headers", "Content-Type")
             res.header("Access-Control-Allow-Methods", allowedMethodsString)
             res.header("Access-Control-Allow-Credentials", "true")
             return next()
