@@ -156,7 +156,7 @@ export class Account {
         userId: string,
         key: string,
     }) {
-        const loginLink = `${DOMAIN}/complete-sign-in?u=${args.userId}&t=${args.key}`
+        const loginLink = `${DOMAIN}/complete-sign-in/?u=${args.userId}&t=${args.key}`
 
         const sender = {
             email: "noreply@enfieldnhzoning.org",
