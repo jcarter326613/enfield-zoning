@@ -15,12 +15,13 @@ export type AuthStatus = {
 }
 
 export type CompleteLoginRequest = {
-    userId: string,
-    token: string,
+    userId: string
+    token: string
 }
 
 export type CompleteLoginResponse = {
-    redirectUrl: string,
+    redirectUrl: string
+    email: string
 }
 
 export type LoginRequest = {

@@ -15,6 +15,7 @@ import SiteLayout from "../layouts/layout.astro"
 <script>
     import $ from "jquery"
 
+    import LogRocket from "logrocket"
     import { type Account } from "@enfield-zoning/website-api-dto"
 
     import { fetchPost } from "../scripts/fetch"
@@ -49,6 +50,9 @@ import SiteLayout from "../layouts/layout.astro"
             if (response == null) {
                 showExpired()
             } else {
+                LogRocket.identify(userId, {
+                    email: response.email
+                })
                 window.location.href = response.redirectUrl
             }
         } catch {

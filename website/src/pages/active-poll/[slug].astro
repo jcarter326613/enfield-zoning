@@ -24,7 +24,7 @@ import SignInButton from "../../components/sign-in-button.astro"
         <h2>Indicate Your Preference</h2>
         <div class="contents logged-in">
             <div class="question"></div>
-            <div class="options"></div>
+            <div class="options" data-private></div>
             <sub>You may change your selection as many times as you like before the poll closes.</sub>
         </div>
         <div class="contents voting-not-allowed">
@@ -78,7 +78,7 @@ import SignInButton from "../../components/sign-in-button.astro"
         <div id="discussion-comments"></div>
 
         <div id="discussion-post-block" style="display:none;">
-            <textarea id="discussion-comment-text" rows="5" maxlength="5000" placeholder="Add a comment"></textarea>
+            <textarea id="discussion-comment-text" rows="5" maxlength="5000" placeholder="Add a comment" data-private></textarea>
             <div id="discussion-error" class="error-message" style="display:none;"></div>
             <button id="submit-discussion-comment" type="button">Post comment</button>
         </div>

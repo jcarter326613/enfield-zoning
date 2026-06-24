@@ -17,10 +17,6 @@ export class User {
             userDto.suppliedDomicileStreet != null && userDto.suppliedDomicileStreet.length > 0
     }
 
-    static isTokenValid(token: LoginTokenDto, key: string) {
-
-    }
-
     // Publics
     async createUser(args: {
         email: string,
@@ -80,12 +76,14 @@ export class User {
 
     async createLoginToken(args: {
         userId: string,
+        email: string,
         redirectUrl: string,
     }): Promise<string> {
         const key = randomBytes(16).toString("base64url")
         const tokenDto: LoginTokenDto = {
             issuedEpoch: (new Date).getTime(),
             key: key,
+            email: args.email,
             redirectUrl: args.redirectUrl
         }
 
@@ -150,6 +148,7 @@ type ByEmailDto = {
 type LoginTokenDto = {
     issuedEpoch: number
     key: string
+    email: string
     redirectUrl: string
 }
 

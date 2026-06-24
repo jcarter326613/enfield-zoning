@@ -98,6 +98,7 @@ const currentPath = Astro.url.pathname
 
         try {
             await fetchGet("account/logout")
+            LogRocket.startNewSession()
             window.location.reload()
         } catch (error) {
             console.error("Logout failed", error)

@@ -88,6 +88,7 @@ export class Account {
             } else {
                 const key = await this.userService.createLoginToken({
                     userId: userId,
+                    email: email,
                     redirectUrl: redirectUrl ?? "/"
                 })
                 await this.sendLoginEmail({
@@ -118,7 +119,8 @@ export class Account {
         ) {
             const response = new Response
             const responseDto: AccountDto.CompleteLoginResponse = {
-                redirectUrl: loginTokenDto.redirectUrl
+                redirectUrl: loginTokenDto.redirectUrl,
+                email: loginTokenDto.email
             }
             response.setGenerateAuthToken(userId)
             response.setJson(responseDto)
