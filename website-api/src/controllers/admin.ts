@@ -4,7 +4,7 @@ import { MailtrapClient } from "mailtrap"
 
 import { Admin as AdminDto } from "@enfield-zoning/website-api-dto"
 
-import { ActivePoll, ActivePollDto, DiscussionCommentDto } from "./active-poll.js"
+import { ActivePoll, DiscussionCommentDto } from "./active-poll.js"
 import { AllCardsDto, Home } from "./home.js"
 import { HttpError } from "../exceptions/http-error.js"
 import { HttpStatusCode } from "../http-status-code.js"

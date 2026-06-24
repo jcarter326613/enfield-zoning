@@ -234,6 +234,7 @@ export type ActivePollDto = {
     {
         type: "zoning-ammendment"
         summaryMarkdown: string
+        detailMarkdown: string
         zoningText: string
     }
 ) & {

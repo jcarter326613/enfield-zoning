@@ -1,6 +1,8 @@
 ---
 import "../styles/global.css"
 
+import LogRocket from 'logrocket'
+
 import SignInButton from "../components/sign-in-button.astro"
 
 interface Props {
@@ -9,6 +11,8 @@ interface Props {
 
 const { title = "Enfield NH Zoning" } = Astro.props
 const currentPath = Astro.url.pathname
+
+LogRocket.init('g4ooym/enfield-nh-zoning')
 ---
 
 <!doctype html>
