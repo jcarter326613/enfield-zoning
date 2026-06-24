@@ -2,6 +2,7 @@
 export type ActivePollResponse = {
     type: "zoning-ammendment"
     summaryMarkdown: string
+    detailMarkdown: string
     zoningText: string
     poll: Poll
 }

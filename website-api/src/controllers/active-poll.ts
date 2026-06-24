@@ -38,6 +38,7 @@ export class ActivePoll {
             return {
                 type: pollData.type,
                 summaryMarkdown: pollData.summaryMarkdown,
+                detailMarkdown: pollData.detailMarkdown,
                 zoningText: pollData.zoningText,
                 poll: pollObject,
             }

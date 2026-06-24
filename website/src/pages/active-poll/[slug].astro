@@ -41,6 +41,10 @@ import SignInButton from "../../components/sign-in-button.astro"
             <div>The response period for this question has expired.  We are compiling results and will post them as soon as possible.</div>
         </div>
     </div>
+    <div id="detail-div" style="display:none;">
+        <h2>Additional Details</h2>
+        <div class="contents"></div>
+    </div>
     <div id="identity-submission" style="display:none;">
         <h2>Voting permission registration</h2>
         <div>
@@ -129,18 +133,21 @@ import SignInButton from "../../components/sign-in-button.astro"
 
         // Get the handles to the render locations
         const summaryDiv = $("#summary-div .contents")
+        const detailDiv = $("#detail-div .contents")
         const actualChangeDiv = $("#actual-change-div .contents")
         const votingBlock = $("#voting-block")
 
         // Clear out the current contents
         votingBlock.hide()
         summaryDiv.html("")
+        detailDiv.html("")
         actualChangeDiv.html("")
 
         // If the poll is a zoning ammendment, populate that
         if (infoModel != null && infoModel.type == "zoning-ammendment") {
             votingBlock.show()
             summaryDiv.html(markdownToHtml(infoModel.summaryMarkdown))
+            detailDiv.html(markdownToHtml(infoModel.detailMarkdown))
             actualChangeDiv.html(markdownToHtml(infoModel.zoningText))
 
             // Get ready to display the voting section    
