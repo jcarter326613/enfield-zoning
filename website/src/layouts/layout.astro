@@ -1,8 +1,6 @@
 ---
 import "../styles/global.css"
 
-import LogRocket from 'logrocket'
-
 import SignInButton from "../components/sign-in-button.astro"
 
 interface Props {
@@ -11,8 +9,6 @@ interface Props {
 
 const { title = "Enfield NH Zoning" } = Astro.props
 const currentPath = Astro.url.pathname
-
-LogRocket.init('g4ooym/enfield-nh-zoning')
 ---
 
 <!doctype html>
@@ -67,6 +63,7 @@ LogRocket.init('g4ooym/enfield-nh-zoning')
 
 <script>
     import $ from "jquery"
+    import LogRocket from 'logrocket'
     import type { Account } from "@enfield-zoning/website-api-dto"
 
     import { fetchGet } from "../scripts/fetch"
@@ -75,6 +72,8 @@ LogRocket.init('g4ooym/enfield-nh-zoning')
     const createButton = $(".auth-actions .create")
     const logoutButton = $(".auth-actions .logout")
     const adminButton = $(".auth-actions .admin")
+    
+    LogRocket.init('g4ooym/enfield-nh-zoning')
 
     async function updateAuthButtons() {
         const response = await fetchGet<Account.AuthStatus>("authstatus")
