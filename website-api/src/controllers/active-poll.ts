@@ -119,10 +119,6 @@ export class ActivePoll {
             throw new HttpError(HttpStatusCode.BAD_REQUEST, "Comment text is required.")
         }
 
-        if (text.length > 5000) {
-            throw new HttpError(HttpStatusCode.BAD_REQUEST, "Comment text is too long.")
-        }
-
         await this.requirePollExists(pollId)
 
         const commentId = await this.s3WriterService.writeJsonFileToS3<DiscussionCommentDto>(
