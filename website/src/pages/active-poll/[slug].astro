@@ -279,7 +279,7 @@ import SignInButton from "../../components/sign-in-button.astro"
 
         const body = $("<div>")
             .addClass("discussion-comment-body")
-            .text(comment.text)
+            .text(decodeURIComponent(comment.text))
 
         header.append(createdAt)
         article.append(header).append(body)
@@ -322,7 +322,7 @@ import SignInButton from "../../components/sign-in-button.astro"
 
         const created = await fetchPost<Poll.CreateDiscussionCommentRequest, Poll.CreateDiscussionCommentResponse>(
             `active-poll/${slug}/discussion`,
-            { text }
+            { text: encodeURIComponent(text) }
         )
 
         if (created?.success !== true) {

@@ -135,7 +135,7 @@ import SignInButton from "../../components/sign-in-button.astro"
         card.attr("data-comment-id", comment.id)
 
         $(".comment-date", node).text(formatDate(comment.createdAtEpoch))
-        $(".comment-text", node).text(comment.text)
+        $(".comment-text", node).text(decodeURIComponent(comment.text))
 
         $(".approve-comment", node).on("click", async () => {
             await approveComment({
