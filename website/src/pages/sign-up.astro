@@ -66,6 +66,27 @@ import SiteLayout from "../layouts/layout.astro"
                     The supplied email is already associated with an account.  To sign in, visit the <a href="/sign-in">sign in</a> page.
                 </div>
 
+                <div class="terms-row">
+                    <label class="terms-checkbox">
+                        <input
+                            id="accept-terms"
+                            type="checkbox"
+                            required
+                        />
+
+                        <span>
+                            I have read and agree to the
+                            <a
+                                href="/terms-of-use.pdf"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Terms of Use
+                            </a>.
+                        </span>
+                    </label>
+                </div>
+
                 <button class="button button-primary" type="submit">
                     Create account
                 </button>
@@ -85,6 +106,7 @@ import SiteLayout from "../layouts/layout.astro"
     const emailError = $("#email-error")
     const errorProcessing = $("#error-processing")
     const errorDuplicate = $("#error-duplicate")
+    const acceptTerms = $("#accept-terms")
 
     emailError.hide()
 
@@ -118,6 +140,11 @@ import SiteLayout from "../layouts/layout.astro"
         if (!isValidEmail(email)) {
             emailError.show()
             emailInput.trigger("focus")
+            return
+        }
+
+        if (!acceptTerms.prop("checked")) {
+            alert("You must agree to the Terms of Use before creating an account.")
             return
         }
 
