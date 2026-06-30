@@ -2,7 +2,6 @@
 import "../../styles/admin/comments.css"
 
 import SiteLayout from "../../layouts/layout.astro"
-import SignInButton from "../../components/sign-in-button.astro"
 ---
 
 <SiteLayout title="Admin Comment Review">
@@ -15,7 +14,6 @@ import SignInButton from "../../components/sign-in-button.astro"
 
         <div id="admin-review-login" style="display:none;">
             <p>You must be signed in as the administrator to review comments.</p>
-            <SignInButton redirectUrl="/admin/comments" />
         </div>
 
         <div id="admin-review-empty" style="display:none;">
