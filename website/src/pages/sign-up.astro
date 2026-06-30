@@ -47,7 +47,7 @@ import SignInButton from "../components/sign-in-button.astro"
                     </label>
 
                     <label>
-                        Enfield address
+                        Enfield street
                         <input name="pollingAddress" type="text" autocomplete="street-address" />
                     </label>
                 </section>
@@ -64,7 +64,7 @@ import SignInButton from "../components/sign-in-button.astro"
                 </div>
 
                 <div id="error-duplicate" class="field-error" style="display:none;">
-                    The supplied email is already associated with an account.  To sign in, visit the <SignInButton /> page.
+                    The supplied email is already associated with an account.  To sign in, visit the <a href="/sign-in">sign in</a> page.
                 </div>
 
                 <button class="button button-primary" type="submit">
@@ -126,7 +126,7 @@ import SignInButton from "../components/sign-in-button.astro"
             event.preventDefault()
 
             alert(
-                "To request polling access, enter both your name and Enfield address. Otherwise leave both polling fields blank."
+                "To request polling access, enter both your name and Enfield street. Otherwise leave both polling fields blank."
             )
         }
 

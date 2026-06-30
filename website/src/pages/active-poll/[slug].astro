@@ -9,7 +9,6 @@ export async function getStaticPaths() {
 import "../../styles/active-poll.css"
 
 import SiteLayout from "../../layouts/layout.astro"
-import SignInButton from "../../components/sign-in-button.astro"
 ---
 
 <SiteLayout title="Enfield NH Zoning Poll">
@@ -29,13 +28,26 @@ import SignInButton from "../../components/sign-in-button.astro"
             <sub>You may change your selection as many times as you like before the poll closes.</sub>
         </div>
         <div class="contents voting-not-allowed">
-            <div>In order to participate in the poll, you must tell us who you are.</div>
-            <div><button id="start-submit-identity">Submit Identity</button></div>
+            <p>In order to participate in the poll, you must tell us who you are.</p>
+            <div>
+                <button
+                    id="start-submit-identity"
+                    class="button button-primary button-nav"
+                >
+                    Submit Identity
+            </button>
+            </div>
         </div>
         <div class="contents logged-out">
-            <div>You must be signed in and identified to participate in polling.</div>
+            <p>You must be signed in and identified to participate in polling.</p>
             <div>
-                <SignInButton redirectUrl="/active-poll" />
+                <a
+                    class="button button-primary button-nav signin"
+                    href={`/sign-in?r=${encodeURIComponent(Astro.url.pathname)}`}
+                >
+                    <span class="button-icon">&#8618;</span>
+                    Sign In
+                </a>
             </div>
         </div>
         <div class="contents expired">
@@ -46,29 +58,59 @@ import SignInButton from "../../components/sign-in-button.astro"
         <h2>Additional Details</h2>
         <div class="contents"></div>
     </div>
-    <div id="identity-submission" style="display:none;">
-        <h2>Voting permission registration</h2>
-        <div>
-            <p>Please provide the following information to show you are an Enfield resident.  Provide your legal 
-                name and street as it would appear on your voter registration or other official documentation.</p>
-            <div>
-                <label for="identity-name">
-                    Legal Name
-                    <input id="identity-name" type="text" />
-                </label>
+    <dialog id="identity-submission">
+        <div class="identity-dialog">
+            <h2>Voting Permission Registration</h2>
+
+            <p>
+                Please provide the following information to show you are an Enfield
+                resident. Provide your legal name and Enfield street as it would
+                appear on your voter registration or other official documentation.
+            </p>
+
+            <div class="form-field">
+                <label for="identity-name">Legal Name</label>
+                <input
+                    id="identity-name"
+                    type="text"
+                    autocomplete="name"
+                />
             </div>
-            <div>
-                <label for="identity-street">
-                    Domicile Street
-                    <input id="identity-street" type="text" />
-                </label>
+
+            <div class="form-field">
+                <label for="identity-street">Enfield Street</label>
+                <input
+                    id="identity-street"
+                    type="text"
+                    autocomplete="address-line1"
+                />
             </div>
-            <div id="identity-error" class="error-message" style="display:none;"></div>
-            <div>
-                <button id="submit-identity">Submit</button>
+
+            <div
+                id="identity-error"
+                class="error-message"
+                style="display:none;"
+            ></div>
+
+            <div class="dialog-buttons">
+                <button
+                    type="button"
+                    class="button button-secondary"
+                    id="cancel-identity"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    class="button button-primary"
+                    id="submit-identity"
+                >
+                    Submit
+                </button>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <div id="discussion-section">
         <div class="discussion-header">
@@ -91,7 +133,13 @@ import SignInButton from "../../components/sign-in-button.astro"
 
         <div id="discussion-login-block" style="display:none;">
             <p>You must be signed in to post a comment.</p>
-            <SignInButton redirectUrl={Astro.url.pathname} />
+            <a
+                class="button button-primary button-nav signin"
+                href={`/sign-in?r=${encodeURIComponent(Astro.url.pathname)}`}
+            >
+                <span class="button-icon">&#8618;</span>
+                Sign In
+            </a>
         </div>
 
         <div id="discussion-bottom"></div>
@@ -109,9 +157,15 @@ import SignInButton from "../../components/sign-in-button.astro"
     import { fetchGet, fetchPost } from "../../scripts/fetch"
     import { markdownToHtml } from "../../scripts/markdown"
 
+    const identityDialog = document.getElementById("identity-submission") as HTMLDialogElement
+
     function connectButtons() {
-        $("#start-submit-identity").on("click", () => {
-            $("#identity-submission").show()
+        $("#start-submit-identity").on("click", (e) => {
+            identityDialog.showModal()
+        })
+
+        $("#cancel-identity").on("click", () => {
+            identityDialog.close()
         })
 
         $("#submit-identity").on("click", submitIdentity)
@@ -233,7 +287,7 @@ import SignInButton from "../../components/sign-in-button.astro"
             legalStreet
         })
 
-        $("#identity-submission").hide()
+        identityDialog.close()
         loadPage()
     }
 

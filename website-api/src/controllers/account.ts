@@ -38,18 +38,33 @@ export class Account {
     }
 
     public async create(args: ControllerParameters<AccountDto.AccountCreateRequest>): Promise<Response> {
+        const email = args.body.email
+        if (email == null || email.trim().length == 0) {
+            throw new HttpError(HttpStatusCode.BAD_REQUEST, "Email required")
+        }
+
         // Create a user
-        const result = await this.userService.createUser(args.body)
+        const userId = await this.userService.createUser(args.body)
         const response = new Response()
 
-        if (result) {
-            // Return an auth token with the new userid
-            const response = new Response()
+        if (userId) {
+            // Get the user object and send the login email
+            const key = await this.userService.createLoginToken({
+                userId: userId,
+                email: email,
+                redirectUrl: "/"
+            })
+            await this.sendLoginEmail({
+                email: args.body.email, 
+                userId: userId, 
+                key: key
+            })
+
+            // SReturn success
             const responseDto: AccountDto.AccountCreateResponse = {
                 success: true,
                 isDuplicate: false,
             }
-            response.setGenerateAuthToken(result)
             response.setJson(responseDto)
         } else {
             const responseDto: AccountDto.AccountCreateResponse = {

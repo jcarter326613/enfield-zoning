@@ -1,8 +1,6 @@
 ---
 import "../styles/global.css"
 
-import SignInButton from "../components/sign-in-button.astro"
-
 interface Props {
     title?: string
 }
@@ -31,20 +29,39 @@ const currentPath = Astro.url.pathname
 
                 <nav class="auth-actions" aria-label="Account actions">
                     {(currentPath == "/sign-in") ? <></> : 
-                        <SignInButton redirectUrl={
-                            (
-                                currentPath != "/" &&
-                                currentPath != "/complete-sign-in" &&
-                                currentPath != "/sign-in-sent" &&
-                                currentPath != "/sign-up" &&
-                                currentPath != "/sign-up-validation"
-                            ) ? currentPath : undefined} />
+                        <a
+                            class="button button-primary button-nav signin"
+                            href={`/sign-in${
+                                (
+                                    currentPath != "/" &&
+                                    currentPath != "/complete-sign-in" &&
+                                    currentPath != "/sign-in-sent" &&
+                                    currentPath != "/sign-up" &&
+                                    currentPath != "/sign-up-validation"
+                                ) ? `?r=${currentPath}` : ""
+                            }`}
+                        >
+                            <span class="button-icon">&#8618;</span>
+                            Sign In
+                        </a>
                     }
+
                     {(currentPath == "/sign-up") ? <></> : 
-                        <a class="button-primary create" href="/sign-up">Create account</a>
+                        <a class="button button-secondary button-nav create" href="/sign-up">
+                            <span class="button-icon">&#10010;</span>
+                            Create account
+                        </a>
                     }
-                    <button class="button-primary logout" type="button">Logout</button>
-                    <a class="button-secondary admin" href="/admin/comments">Admin</a>
+
+                    <button class="button button-primary button-nav logout" type="button">
+                        <span class="button-icon">&#8617;</span>
+                        Logout
+                    </button>
+
+                    <a class="button button-secondary button-nav admin" href="/admin/comments">
+                        <span class="button-icon">&#9881;</span>
+                        Admin
+                    </a>
                 </nav>
             </header>
 
