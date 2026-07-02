@@ -4,8 +4,12 @@ import * as lambda from "aws-cdk-lib/aws-lambda"
 import * as iam from "aws-cdk-lib/aws-iam"
 import { Construct } from "constructs"
 
+interface WebsiteApiStackProps extends cdk.StackProps {
+    deployment: "dev" | "prod"
+}
+
 export class WebsiteApiStack extends cdk.Stack {
-    public constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+    public constructor(scope: Construct, id: string, props?: WebsiteApiStackProps) {
         super(scope, id, props)
 
         const imageTag = this.node.tryGetContext("imageTag")
@@ -26,8 +30,11 @@ export class WebsiteApiStack extends cdk.Stack {
             "enfieldzoning-api"
         )
 
+        const functionName = props.deployment === "prod" ? 
+            "enfieldnhzoning-website-api-prod" : 
+            "enfieldnhzoning-website-api"
         const websiteApiLambda = new lambda.DockerImageFunction(this, "WebsiteApiLambda", {
-            functionName: "enfieldnhzoning-website-api",
+            functionName: functionName,
             code: lambda.DockerImageCode.fromEcr(repository, {
                 tagOrDigest: imageTag
             }),
